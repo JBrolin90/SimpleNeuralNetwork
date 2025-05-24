@@ -12,7 +12,19 @@ public interface INode
     double ProcessInputs(double[] inputs);
 }
 
-public class Node
+public interface INodeFactory
+{
+    INode Create(double[] weights, double bias, Func<double, double>? activationFunction = null);
+}
+
+public class NodeFactory : INodeFactory
+{
+    public INode Create(double[] weights, double bias, Func<double, double>? activationFunction = null)
+    {
+        return new Node(weights, bias, activationFunction);
+    }
+}
+public class Node : INode
 {
     public double[] Weights { get; set; }
 
@@ -26,20 +38,16 @@ public class Node
 
     public double Bias { get; set; }
     public Func<double, double> ActivationFunction { get; set; }
-    public double Output { get; set; }
-    public double Input { get; set; }
-    public double Delta { get; set; }
+    public double Output { get; set; } = 0;
+    public double Input { get; set; } = 0;
 
-    public Node(int inputSize, Func<double, double>? activationFunction = null)
+    public Node(double[] weights, double bias, Func<double, double>? activationFunction = null)
     {
-        activationFunction ??= SoftPlus;
-        ActivationFunction = activationFunction;
-        Weights = new double[inputSize];
-        Bias = 0;
-        Output = 0;
-        Input = 0;
-        Delta = 0;
+        ActivationFunction = activationFunction ?? SoftPlus;
+        Weights = weights;
+        Bias = bias;
     }
+
 
     public double ProcessInputs(double[] inputs)
     {
@@ -49,10 +57,9 @@ public class Node
             Input += inputs[i] * Weights[i];
         }
         Input += Bias;
-        Output = ActivationFunction(Input);
+        Output = (ActivationFunction ?? UnitActivation)(Input);
         return Output;
     }
-
     public static double UnitActivation(double x) => x;
 
     public static double SoftPlus(double x)
