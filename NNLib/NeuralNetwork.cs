@@ -12,12 +12,14 @@ public class NeuralNetwork : INeuralNetwork
     private ILayer[] layers;
     private double learningRate = 0.01;
     private bool log = false;
+    protected double[][][] biases;
 
     public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][] biases, Func<double, double>[]? activationFunctions = null,
+                        double[][][] weights, double[][][] biases, Func<double, double>[]? activationFunctions = null,
                         double learningRate = 0.01)
     {
         this.learningRate = learningRate;
+        this.biases = biases;
         layers = new ILayer[weights.Length];
         for (int i = 0; i < weights.Length; i++)
         {

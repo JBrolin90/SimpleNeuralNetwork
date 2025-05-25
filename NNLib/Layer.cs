@@ -12,12 +12,12 @@ public interface ILayer
 
 public interface ILayerFactory
 {
-    ILayer Create(INodeFactory factory, double[][] weights, double[] biases, Func<double, double>? activationFunctions = null);
+    ILayer Create(INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null);
 }
 
 public class LayerFactory : ILayerFactory
 {
-    public ILayer Create(INodeFactory factory, double[][] weights, double[] biases, Func<double, double>? activationFunctions = null)
+    public ILayer Create(INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null)
     {
         return new Layer(factory, weights, biases, activationFunctions);
     }
@@ -27,9 +27,11 @@ public class Layer : ILayer
 {
     private readonly INode[] nodes;
     private readonly double[][] weights;
-    public Layer(INodeFactory NodeFactory, double[][] weights, double[] biases, Func<double, double>? activationFunction = null)
+    private readonly double[][] biases;
+    public Layer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
     {
         this.weights = weights;
+        this.biases = biases;
         nodes = new INode[weights.Length];
         for (int i = 0; i < weights.Length; i++)
         {

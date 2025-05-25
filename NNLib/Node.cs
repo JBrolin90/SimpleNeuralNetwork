@@ -5,7 +5,7 @@ namespace BackPropagation.NNLib;
 public interface INode
 {
     double[] Weights { get; set; }
-    double Bias { get; set; }
+    double[] Bias { get; set; }
     Func<double, double> ActivationFunction { get; set; }
     Func<double, double> ActivationDerivative { get; set; }
     double Output { get; set; }
@@ -15,12 +15,12 @@ public interface INode
 
 public interface INodeFactory
 {
-    INode Create(double[] weights, double bias, Func<double, double>? activationFunction = null);
+    INode Create(double[] weights, double[] bias, Func<double, double>? activationFunction = null);
 }
 
 public class NodeFactory : INodeFactory
 {
-    public INode Create(double[] weights, double bias, Func<double, double>? activationFunction = null)
+    public INode Create(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
         return new Node(weights, bias, activationFunction);
     }
@@ -37,13 +37,13 @@ public class Node : INode
         set { Weights[index] = value; }
     }
 
-    public double Bias { get; set; }
+    public double[] Bias { get; set; }
     public Func<double, double> ActivationFunction { get; set; } = SoftPlus;
     public Func<double, double> ActivationDerivative { get; set; } = UnitActivation;
     public double Output { get; set; } = 0;
     public double Input { get; set; } = 0;
 
-    public Node(double[] weights, double bias, Func<double, double>? activationFunction = null)
+    public Node(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
         ActivationFunction = activationFunction ?? SoftPlus;
         Weights = weights;
@@ -70,7 +70,7 @@ public class Node : INode
         {
             Input += inputs[i] * Weights[i];
         }
-        Input += Bias;
+        Input += Bias[0];
         Output = (ActivationFunction ?? UnitActivation)(Input);
         return Output;
     }

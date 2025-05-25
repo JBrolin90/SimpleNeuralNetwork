@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 
 namespace BackPropagation.NNLib;
 
@@ -6,9 +7,10 @@ public class TestNeuralNetwork : NeuralNetwork
 {
     public double SSR = 0;
     public double dSSR = 0;
+    public double db3 = 0;
 
     public TestNeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][] biases,
+                        double[][][] weights, double[][][] biases,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
                         : base(LayerFactory, NodeFactory, weights, biases, activationFunctions, learningRate)
     { }
@@ -21,9 +23,12 @@ public class TestNeuralNetwork : NeuralNetwork
         {
             predictions[i] = Predict([inputs[i]]);
             SSR += Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
-            dSSR = -2 * (expectedOutputs[i] - predictions[i][0]);
-            db3 = dSSR * 1; // Assuming a single output node
+            dSSR += -2 * (expectedOutputs[i] - predictions[i][0]);
         }
+        db3 = dSSR * 1;
+        double step = db3 * 0.1;
+        biases[1][0][0] -= step; // Update the bias for the output layer
+
         Console.WriteLine($"Inputs: {string.Join(", ", inputs)}");
         Console.WriteLine($"Expected Outputs: {string.Join(", ", expectedOutputs)}");
         Console.WriteLine($"Predicted Outputs: {string.Join(", ", predictions.Select(arr => string.Join(";", arr)))}");
