@@ -14,9 +14,12 @@ weights[0][1] = [-3.53];
 weights[1] = new double[1][];
 weights[1][0] = [-1.22, -2.3];
 
-double[][] biases = new double[2][];
-biases[0] = [-1.43, 0.57];
-biases[1] = [3.0];
+double[][][] biases = new double[2][][];
+biases[0] = new double[2][];
+biases[0][0] = [-1.43];
+biases[0][1] = [0.57];
+biases[1] = new double[1][];
+biases[1][0] = [0.0];
 
 Func<double, double>[] activationFunctions = [
     Node.SoftPlus, // Activation function for the first layer
@@ -32,5 +35,8 @@ Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]}");
 // Test the neural network with the provided inputs
 TestNeuralNetwork testNN = new(new LayerFactory(), new NodeFactory(),
     weights, biases, 0.01, activationFunctions);
-testNN.Test(inputs, observed);
+for (int i = 0; i < 10; i++)
+{
+    testNN.Test(inputs, observed);
+}
 Console.WriteLine($"SSR: {testNN.SSR}");
