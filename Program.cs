@@ -12,11 +12,11 @@ weights[0] = new double[2][];
 weights[0][0] = [3.34];
 weights[0][1] = [-3.53];
 weights[1] = new double[1][];
-weights[1][0] = [1.22, -2.3];
+weights[1][0] = [-1.22, -2.3];
 
 double[][] biases = new double[2][];
 biases[0] = [-1.43, 0.57];
-biases[1] = [0];
+biases[1] = [3.0];
 
 Func<double, double>[] activationFunctions = [
     Node.SoftPlus, // Activation function for the first layer

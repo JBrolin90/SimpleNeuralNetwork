@@ -7,6 +7,7 @@ public interface INode
     double[] Weights { get; set; }
     double Bias { get; set; }
     Func<double, double> ActivationFunction { get; set; }
+    Func<double, double> ActivationDerivative { get; set; }
     double Output { get; set; }
 
     double ProcessInputs(double[] inputs);
@@ -37,7 +38,8 @@ public class Node : INode
     }
 
     public double Bias { get; set; }
-    public Func<double, double> ActivationFunction { get; set; }
+    public Func<double, double> ActivationFunction { get; set; } = SoftPlus;
+    public Func<double, double> ActivationDerivative { get; set; } = UnitActivation;
     public double Output { get; set; } = 0;
     public double Input { get; set; } = 0;
 
@@ -46,6 +48,18 @@ public class Node : INode
         ActivationFunction = activationFunction ?? SoftPlus;
         Weights = weights;
         Bias = bias;
+        if (ActivationFunction == SoftPlus)
+        {
+            ActivationDerivative = SoftPlusDerivative;
+        }
+        else if (ActivationFunction == Sigmoid)
+        {
+            ActivationDerivative = SigmoidDerivative;
+        }
+        else if (ActivationDerivative == UnitActivation)
+        {
+            ActivationFunction = UnitActivation;
+        }
     }
 
 
