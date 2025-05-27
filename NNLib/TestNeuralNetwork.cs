@@ -12,7 +12,7 @@ public class TestNeuralNetwork : NeuralNetwork
     public double dw3 = 0;
     public double dw4 = 0;
 
-    public double[][][] dw = [
+    public double[][][] stepSizes = [
         [
             [0.0],
             [0.0]
@@ -40,9 +40,10 @@ public class TestNeuralNetwork : NeuralNetwork
             Descent(dSSR);
             db3 += dSSR * 1;
         }
+        UpdateWeightsAndBiases();
         // Weigths[1][0][0] -= dw3 * 0.1; // Update the weight for the output Layer
         // Weigths[1][0][1] -= dw3 * 0.1; // Update the weight for the output Layer
-        // Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
+        Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
 
 
         Console.WriteLine($"Inputs: {string.Join(", ", inputs)}");
@@ -67,13 +68,17 @@ public class TestNeuralNetwork : NeuralNetwork
             {
                 for (int l = 0; l < node.Length; l++)
                 {
-                    double r = -node[l];
-                    dw[j][k][l] += r;
+                    double r = node[l];
+                    stepSizes[j][k][l] += r;
                 }
                 k++;
             }
             j++;
         }
+    }
+
+    private void UpdateWeightsAndBiases()
+    {
         // Update weights and biases
         for (int j1 = 0; j1 < Weigths.Length; j1++)
         {
@@ -81,10 +86,10 @@ public class TestNeuralNetwork : NeuralNetwork
             {
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
-                    Weigths[j1][k1][l] -= dw[j1][k1][l] * 0.1; //LearningRate;
+                    double delta = stepSizes[j1][k1][l];
+                    Weigths[j1][k1][l] -= delta * 0.1; //LearningRate;
                 }
             }
         }
     }
-
 }
