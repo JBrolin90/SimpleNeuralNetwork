@@ -36,17 +36,13 @@ public class TestNeuralNetwork : NeuralNetwork
         {
             predictions[i] = Predict([inputs[i]]);
             SSR += Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
-            dSSR += -2 * (expectedOutputs[i] - predictions[i][0]);
-            dw3 += dSSR * Ys[0][0];
-            dw4 += dSSR * Ys[0][1];
-            // dw[1][0][0] += dSSR * Ys[0][0]; // Update the weight for the output Layer
-            // dw[1][0][1] += dSSR * Ys[0][1]; // Update the weight for the output Layer
+            dSSR = -2 * (expectedOutputs[i] - predictions[i][0]);
             Descent(dSSR);
+            db3 += dSSR * 1;
         }
-        db3 = dSSR * 1;
-        Weigths[1][0][0] -= dw3 * 0.1; // Update the weight for the output Layer
-        Weigths[1][0][1] -= dw3 * 0.1; // Update the weight for the output Layer
-        Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
+        // Weigths[1][0][0] -= dw3 * 0.1; // Update the weight for the output Layer
+        // Weigths[1][0][1] -= dw3 * 0.1; // Update the weight for the output Layer
+        // Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
 
 
         Console.WriteLine($"Inputs: {string.Join(", ", inputs)}");
@@ -71,11 +67,23 @@ public class TestNeuralNetwork : NeuralNetwork
             {
                 for (int l = 0; l < node.Length; l++)
                 {
-                    dw[j][k][l] += node[l];
+                    double r = -node[l];
+                    dw[j][k][l] += r;
                 }
                 k++;
             }
             j++;
+        }
+        // Update weights and biases
+        for (int j1 = 0; j1 < Weigths.Length; j1++)
+        {
+            for (int k1 = 0; k1 < Weigths[j1].Length; k1++)
+            {
+                for (int l = 0; l < Weigths[j1][k1].Length; l++)
+                {
+                    Weigths[j1][k1][l] -= dw[j1][k1][l] * 0.1; //LearningRate;
+                }
+            }
         }
     }
 

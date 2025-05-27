@@ -85,11 +85,6 @@ public class Node : INode
         }
 
         WeightsResiduals = GetWeightsResiduals(dSSR, Xs);
-        for (int i = 0; i < Weights.Length; i++)
-        {
-            Weights[i] -= WeightsResiduals[i] * dSSR;
-        }
-        Bias[0] -= BiasDerivative() * dSSR; // Update the bias for the node
         return WeightsResiduals;
     }
 
@@ -99,16 +94,15 @@ public class Node : INode
         WeightsResiduals = new double[Weights.Length];
         for (int i = 0; i < Weights.Length; i++)
         {
-            WeightDerivatives[i] = WeightDerivative(Weights[i], xs[i]);
+            if (i == 0)
+                WeightDerivatives[i] = ActivationDerivative(xs[i]);
+            else
+                WeightDerivatives[i] = ActivationDerivative(xs[i]);
             WeightsResiduals[i] = WeightDerivatives[i] * dSSR;
         }
         return WeightsResiduals;
     }
 
-    public double WeightDerivative(double weight, double x)
-    {
-        return ActivationDerivative(x) * weight;
-    }
     public double BiasDerivative()
     {
         return ActivationDerivative(Sum);

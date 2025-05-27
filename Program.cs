@@ -24,7 +24,7 @@ Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]}");
 // Test the neural network with the provided inputs
 TestNeuralNetwork testNN = new(new LayerFactory(), new NodeFactory(),
     weights, biases, ys, 0.01, activationFunctions);
-for (int i = 0; i < 10; i++)
+for (int i = 0; i < 1; i++)
 {
     testNN.Test(inputs, observed);
 }
