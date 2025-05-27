@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Net.WebSockets;
 
 namespace BackPropagation.NNLib;
 
@@ -8,11 +9,23 @@ public class TestNeuralNetwork : NeuralNetwork
     public double SSR = 0;
     public double dSSR = 0;
     public double db3 = 0;
+    public double dw3 = 0;
+    public double dw4 = 0;
+
+    public double[][][] dw = [
+        [
+            [0.0],
+            [0.0]
+        ],
+        [
+            [0.0, 0.0]
+        ]
+    ];
 
     public TestNeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][][] biases,
+                        double[][][] weights, double[][][] biases, double[][] ys,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
-                        : base(LayerFactory, NodeFactory, weights, biases, activationFunctions, learningRate)
+                        : base(LayerFactory, NodeFactory, weights, biases, ys, activationFunctions, learningRate)
     { }
 
     public void Test(double[] inputs, double[] expectedOutputs)
@@ -24,15 +37,46 @@ public class TestNeuralNetwork : NeuralNetwork
             predictions[i] = Predict([inputs[i]]);
             SSR += Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
             dSSR += -2 * (expectedOutputs[i] - predictions[i][0]);
+            dw3 += dSSR * Ys[0][0];
+            dw4 += dSSR * Ys[0][1];
+            // dw[1][0][0] += dSSR * Ys[0][0]; // Update the weight for the output Layer
+            // dw[1][0][1] += dSSR * Ys[0][1]; // Update the weight for the output Layer
+            Descent(dSSR);
         }
         db3 = dSSR * 1;
-        double step = db3 * 0.1;
-        biases[1][0][0] -= step; // Update the bias for the output layer
+        Weigths[1][0][0] -= dw3 * 0.1; // Update the weight for the output Layer
+        Weigths[1][0][1] -= dw3 * 0.1; // Update the weight for the output Layer
+        Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
+
 
         Console.WriteLine($"Inputs: {string.Join(", ", inputs)}");
         Console.WriteLine($"Expected Outputs: {string.Join(", ", expectedOutputs)}");
         Console.WriteLine($"Predicted Outputs: {string.Join(", ", predictions.Select(arr => string.Join(";", arr)))}");
         Console.WriteLine();
+    }
+
+    public void Descent(double dSSR)
+    {
+        double[][][] gradients = new double[Layers.Length][][];
+        int i = 0;
+        foreach (var layer in Layers)
+        {
+            gradients[i++] = layer.Descent(dSSR);
+        }
+        int j = 0;
+        foreach (var layer in gradients)
+        {
+            int k = 0;
+            foreach (var node in layer)
+            {
+                for (int l = 0; l < node.Length; l++)
+                {
+                    dw[j][k][l] += node[l];
+                }
+                k++;
+            }
+            j++;
+        }
     }
 
 }

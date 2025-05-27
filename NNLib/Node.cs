@@ -2,17 +2,7 @@ using System;
 
 namespace BackPropagation.NNLib;
 
-public interface INode
-{
-    double[] Weights { get; set; }
-    double[] Bias { get; set; }
-    Func<double, double> ActivationFunction { get; set; }
-    Func<double, double> ActivationDerivative { get; set; }
-    double Output { get; set; }
-
-    double ProcessInputs(double[] inputs);
-}
-
+#region Factory
 public interface INodeFactory
 {
     INode Create(double[] weights, double[] bias, Func<double, double>? activationFunction = null);
@@ -25,29 +15,41 @@ public class NodeFactory : INodeFactory
         return new Node(weights, bias, activationFunction);
     }
 }
+
+#endregion
+
+public interface INode
+{
+    double[] Weights { get; set; }
+    double[] Bias { get; set; }
+    Func<double, double> ActivationFunction { get; set; }
+    Func<double, double> ActivationDerivative { get; set; }
+    double BiasDerivative();
+    public double[] GetWeightsResiduals(double dSSR, double[] xs);
+    double Y { get; set; }
+
+    double ProcessInputs(double[] inputs);
+    double[] Descent(double dSSR);
+}
+
 public class Node : INode
 {
     public double[] Weights { get; set; }
-
-    //A property to access individual weights using [] notation
-    // This is a workaround for the fact that C# does not support indexers in classes
-    public double this[int index]
-    {
-        get { return Weights[index]; }
-        set { Weights[index] = value; }
-    }
-
     public double[] Bias { get; set; }
+    public double[] WeightDerivatives { get; set; }
+    double[]? WeightsResiduals { get; set; }
+    public double Sum { get; set; } = 0;
+    public double Y { get; set; } = 0;
+    public double[]? Xs { get; set; }
     public Func<double, double> ActivationFunction { get; set; } = SoftPlus;
     public Func<double, double> ActivationDerivative { get; set; } = UnitActivation;
-    public double Output { get; set; } = 0;
-    public double Input { get; set; } = 0;
 
     public Node(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
-        ActivationFunction = activationFunction ?? SoftPlus;
         Weights = weights;
-        Bias = bias;
+        Bias = bias; // store bias by reference using array
+        WeightDerivatives = new double[weights.Length];
+        ActivationFunction = activationFunction ?? SoftPlus;
         if (ActivationFunction == SoftPlus)
         {
             ActivationDerivative = SoftPlusDerivative;
@@ -62,18 +64,59 @@ public class Node : INode
         }
     }
 
-
-    public double ProcessInputs(double[] inputs)
+    public double ProcessInputs(double[] xs)
     {
-        Input = 0;
-        for (int i = 0; i < inputs.Length; i++)
+        Xs = xs;
+        Sum = 0;
+        for (int i = 0; i < xs.Length; i++)
         {
-            Input += inputs[i] * Weights[i];
+            Sum += xs[i] * Weights[i];
         }
-        Input += Bias[0];
-        Output = (ActivationFunction ?? UnitActivation)(Input);
-        return Output;
+        Sum += Bias[0];
+        Y = (ActivationFunction ?? UnitActivation)(Sum);
+        return Y;
     }
+
+    public double[] Descent(double dSSR)
+    {
+        if (Xs == null)
+        {
+            throw new InvalidOperationException("Inputs must be processed before descent.");
+        }
+
+        WeightsResiduals = GetWeightsResiduals(dSSR, Xs);
+        for (int i = 0; i < Weights.Length; i++)
+        {
+            Weights[i] -= WeightsResiduals[i] * dSSR;
+        }
+        Bias[0] -= BiasDerivative() * dSSR; // Update the bias for the node
+        return WeightsResiduals;
+    }
+
+
+    public double[] GetWeightsResiduals(double dSSR, double[] xs)
+    {
+        WeightsResiduals = new double[Weights.Length];
+        for (int i = 0; i < Weights.Length; i++)
+        {
+            WeightDerivatives[i] = WeightDerivative(Weights[i], xs[i]);
+            WeightsResiduals[i] = WeightDerivatives[i] * dSSR;
+        }
+        return WeightsResiduals;
+    }
+
+    public double WeightDerivative(double weight, double x)
+    {
+        return ActivationDerivative(x) * weight;
+    }
+    public double BiasDerivative()
+    {
+        return ActivationDerivative(Sum);
+    }
+
+
+
+    #region Static Activation Functions
     public static double UnitActivation(double x) => x;
 
     public static double SoftPlus(double x)
@@ -92,4 +135,6 @@ public class Node : INode
     {
         return x * (1 - x);
     }
+
+    #endregion
 }

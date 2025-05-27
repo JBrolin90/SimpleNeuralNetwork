@@ -9,29 +9,32 @@ public interface INeuralNetwork
 
 public class NeuralNetwork : INeuralNetwork
 {
-    private ILayer[] layers;
-    private double learningRate = 0.01;
-    private bool log = false;
-    protected double[][][] biases;
+    public ILayer[] Layers { get; set; }
+    public double[][] Ys { get; set; }
+    public double[][][] Weigths { get; set; }
+    public double[][][] Biases { get; set; }
 
     public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][][] biases, Func<double, double>[]? activationFunctions = null,
+                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[]? activationFunctions = null,
                         double learningRate = 0.01)
     {
-        this.learningRate = learningRate;
-        this.biases = biases;
-        layers = new ILayer[weights.Length];
+        Ys = ys;
+        Weigths = weights;
+        Biases = biases;
+        Layers = new ILayer[weights.Length];
         for (int i = 0; i < weights.Length; i++)
         {
-            layers[i] = LayerFactory.Create(NodeFactory, weights[i], biases[i], activationFunctions?[i] ?? Node.SoftPlus);
+            Layers[i] = LayerFactory.Create(NodeFactory, weights[i], biases[i], activationFunctions?[i] ?? Node.SoftPlus);
         }
     }
     public double[] Predict(double[] inputs)
     {
+        int i = 0;
         double[] outputs = inputs;
-        foreach (var layer in layers)
+        foreach (var layer in Layers)
         {
             outputs = layer.Forward(outputs);
+            Ys[i++] = outputs;
         }
         return outputs;
     }
