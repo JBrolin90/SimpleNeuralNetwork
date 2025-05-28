@@ -103,6 +103,22 @@ public class Node : INode
         return WeightsResiduals;
     }
 
+    public double WeightDerivative(int index, double[] xs)
+    {
+        if (index < 0 || index >= Weights.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
+        }
+        return xs[index] * ActivationDerivative(Sum);
+    }
+    public double WeightDerivative(int index)
+    {
+        if (index < 0 || index >= Weights.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
+        }
+        return Weights[index] * ActivationDerivative(Sum);
+    }
     public double BiasDerivative()
     {
         return ActivationDerivative(Sum);
