@@ -40,10 +40,7 @@ public interface ILayer
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
     // public double[][] Backward();
-    double[][] GetWeightUpdates(double[] inputs, double[] errors);
-
-    double[][] Descent(double dSSR);
-
+    NodeSteps[] Backward(NodeSteps[] nodeSteps, double dSSR);
     static double UnitActivation(double x) => x;
     static double SoftPlus(double x) => Math.Log(1 + Math.Exp(x));
 }
@@ -85,25 +82,28 @@ public class Layer : ILayer
         return Ys;
     }
 
-    public virtual double[][] GetWeightUpdates(double[] inputs, double[] errors)
+    int currentNodeIndex = 0;
+    public double GetChainFactor()
     {
-        double[][] weightUpdates = new double[Nodes.Length][];
-        for (int j = 0; j < Nodes.Length; j++)
+        double factor = 0;
+        for (int i = 0; i < NextLayer.Nodes.Length; i++)
         {
-            weightUpdates[j] = Nodes[j].GetWeightUpdates(inputs, errors[j]);
+            factor += NextLayer.Nodes[i].GetChainFactor();
         }
-        return weightUpdates;
+        return factor;
     }
 
 
-    public double[][] Descent(double dSSR)
+    public NodeSteps[] Backward(NodeSteps[] nodeSteps, double dSSR)
     {
-        double[][] gradients = new double[Nodes.Length][];
+        NodeSteps[] steps = new NodeSteps[Nodes.Length];
         for (int i = 0; i < Nodes.Length; i++)
         {
-            gradients[i] = Nodes[i].Descent(dSSR);
+            currentNodeIndex = i;
+            // Calculate the chain factor for the current node
+            steps[i] = Nodes[i].Backward(nodeSteps[i], dSSR, GetChainFactors);
         }
-        return gradients;
+        return steps;
     }
 
 }

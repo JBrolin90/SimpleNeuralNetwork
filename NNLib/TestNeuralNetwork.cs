@@ -4,23 +4,17 @@ using System.Net.WebSockets;
 
 namespace BackPropagation.NNLib;
 
+public struct NodeSteps
+{
+    public double[] WeightSteps;
+    public double BiasStep;
+}
+
 public class TestNeuralNetwork : NeuralNetwork
 {
     public double SSR = 0;
     public double dSSR = 0;
-    public double db3 = 0;
-    public double dw3 = 0;
-    public double dw4 = 0;
-
-    public double[][][] stepSizes = [
-        [
-            [0.0],
-            [0.0]
-        ],
-        [
-            [0.0, 0.0]
-        ]
-    ];
+    public NodeSteps[][] nodeSteps = Array.Empty<NodeSteps[]>();
 
     public TestNeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys,
@@ -35,45 +29,22 @@ public class TestNeuralNetwork : NeuralNetwork
         for (int i = 0; i < inputs.Length; i++)
         {
             predictions[i] = Predict([inputs[i]]);
-            SSR += Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
-            dSSR = -2 * (expectedOutputs[i] - predictions[i][0]);
-            Descent(dSSR);
-            db3 += dSSR * 1;
+            SSR += 0.5 * Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
+            dSSR = predictions[i][0] - expectedOutputs[i];
+            BackPropagate(dSSR);
         }
         UpdateWeightsAndBiases();
-        // Weigths[1][0][0] -= dw3 * 0.1; // Update the weight for the output Layer
-        // Weigths[1][0][1] -= dw3 * 0.1; // Update the weight for the output Layer
-        Biases[1][0][0] -= db3 * 0.1; // Update the bias for the output layer
 
-
-        Console.WriteLine($"Inputs: {string.Join(", ", inputs)}");
-        Console.WriteLine($"Expected Outputs: {string.Join(", ", expectedOutputs)}");
-        Console.WriteLine($"Predicted Outputs: {string.Join(", ", predictions.Select(arr => string.Join(";", arr)))}");
-        Console.WriteLine();
     }
 
-    public void Descent(double dSSR)
+    public void BackPropagate(double dSSR)
     {
-        double[][][] gradients = new double[Layers.Length][][];
+        NodeSteps[][] nodeSteps = new NodeSteps[Layers.Length][];
+
         int i = 0;
         foreach (var layer in Layers)
         {
-            gradients[i++] = layer.Descent(dSSR);
-        }
-        int j = 0;
-        foreach (var layer in gradients)
-        {
-            int k = 0;
-            foreach (var node in layer)
-            {
-                for (int l = 0; l < node.Length; l++)
-                {
-                    double r = node[l];
-                    stepSizes[j][k][l] += r;
-                }
-                k++;
-            }
-            j++;
+            nodeSteps[i++] = layer.Backward(nodeSteps[i], dSSR);
         }
     }
 
@@ -86,8 +57,8 @@ public class TestNeuralNetwork : NeuralNetwork
             {
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
-                    double delta = stepSizes[j1][k1][l];
-                    Weigths[j1][k1][l] -= delta * 0.1; //LearningRate;
+                    // double delta = stepSizes[j1][k1][l];
+                    //Weigths[j1][k1][l] -= delta * 0.1; //LearningRate;
                 }
             }
         }

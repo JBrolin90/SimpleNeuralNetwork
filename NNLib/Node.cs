@@ -24,13 +24,9 @@ public interface INode
     double[] Bias { get; set; }
     Func<double, double> ActivationFunction { get; set; }
     Func<double, double> ActivationDerivative { get; set; }
-    double BiasDerivative();
-    public double[] GetWeightsResiduals(double dSSR, double[] xs);
-    public double[] GetWeightUpdates(double[] inputs, double error);
-    double Y { get; set; }
-
+    NodeSteps Backward(NodeSteps nodeSteps, double error, Func<double> GetChainFactor);
+    double GetChainFactor();
     double ProcessInputs(double[] inputs);
-    double[] Descent(double dSSR);
 }
 
 public class Node : INode
@@ -39,12 +35,11 @@ public class Node : INode
     public double[] Weights { get; set; }
     public double[] Bias { get; set; }
     public double[] WeightDerivatives { get; set; }
-    double[]? WeightsResiduals { get; set; }
     public double Sum { get; set; } = 0;
     public double Y { get; set; } = 0;
     public double[]? Xs { get; set; }
-    public Func<double, double> ActivationFunction { get; set; } = SoftPlus;
-    public Func<double, double> ActivationDerivative { get; set; } = UnitActivationDerivative;
+    public Func<double, double> ActivationFunction { get; set; } = ActivationFunctions.SoftPlus;
+    public Func<double, double> ActivationDerivative { get; set; } = ActivationFunctions.SoftPlusDerivative;
     #endregion
     #region Constructors
     public Node(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
@@ -52,18 +47,18 @@ public class Node : INode
         Weights = weights;
         Bias = bias; // store bias by reference using array
         WeightDerivatives = new double[weights.Length];
-        ActivationFunction = activationFunction ?? SoftPlus;
-        if (ActivationFunction == SoftPlus)
+        ActivationFunction = activationFunction ?? ActivationFunctions.SoftPlus;
+        if (ActivationFunction == ActivationFunctions.SoftPlus)
         {
-            ActivationDerivative = SoftPlusDerivative;
+            ActivationDerivative = ActivationFunctions.SoftPlusDerivative;
         }
-        else if (ActivationFunction == Sigmoid)
+        else if (ActivationFunction == ActivationFunctions.Sigmoid)
         {
-            ActivationDerivative = SigmoidDerivative;
+            ActivationDerivative = ActivationFunctions.SigmoidDerivative;
         }
-        else if (ActivationDerivative == UnitActivation)
+        else if (ActivationDerivative == ActivationFunctions.Unit)
         {
-            ActivationFunction = UnitActivationDerivative;
+            ActivationFunction = ActivationFunctions.UnitDerivative;
         }
     }
     #endregion
@@ -77,91 +72,75 @@ public class Node : INode
             Sum += xs[i] * Weights[i];
         }
         Sum += Bias[0];
-        Y = (ActivationFunction ?? UnitActivation)(Sum);
+        Y = (ActivationFunction ?? ActivationFunctions.Unit)(Sum);
         return Y;
     }
     #endregion
     #region Backpropagation
-    public double[] GetWeightUpdates(double[] inputs, double error)
-    {
-        const double LearningRate = 0.01; // Set a default learning rate
-        double[] weightUpdates = new double[Weights.Length];
-        for (int k = 0; k < Weights.Length; k++)
-        {
-            weightUpdates[k] = LearningRate * GetWeightDerivativeW(k, Xs ?? throw new NullReferenceException()) - error;
-        }
-        return weightUpdates;
-    }
 
-    public double[] Descent(double dSSR)
+    public NodeSteps Backward(NodeSteps nodeSteps, double error, Func<double> GetChainFactor)
     {
         if (Xs == null)
         {
-            throw new InvalidOperationException("Inputs must be processed before descent.");
+            throw new InvalidOperationException("Inputs must be processed before backpropagation.");
         }
 
-        WeightsResiduals = GetWeightsResiduals(dSSR, Xs);
-        return WeightsResiduals;
-    }
-
-
-    public double[] GetWeightsResiduals(double dSSR, double[] xs)
-    {
-        WeightsResiduals = new double[Weights.Length];
+        nodeSteps.WeightSteps = new double[Weights.Length];
         for (int i = 0; i < Weights.Length; i++)
         {
-            if (i == 0)
-                WeightDerivatives[i] = ActivationDerivative(xs[i]);
-            else
-                WeightDerivatives[i] = ActivationDerivative(xs[i]);
-            WeightsResiduals[i] = WeightDerivatives[i] * dSSR;
+            nodeSteps.WeightSteps[i] = GetFullWeightStep(i, error, GetChainFactor) * error;
         }
-        return WeightsResiduals;
+        nodeSteps.BiasStep = BiasDerivative() * error;
+
+        return nodeSteps;
+    }
+    public double GetChainFactor()
+    {
+        double x = 0;
+        x += GetWeightDerivativeX(i) * ActivationDerivative(Sum);
+        return x;
+
     }
 
-    public double GetWeightDerivativeW(int index, double[] xs)
+    public double GetFullWeightStep(int index, double error, Func<double> GetChainFactor)
     {
+        double[] fullWeightsStep = new double[Weights.Length];
         if (index < 0 || index >= Weights.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
         }
-        return xs[index] * ActivationDerivative(xs[index] * Weights[index] + Bias[0]);
+        fullWeightStep = GetWeightDerivativeW(index) * GetChainFactor() * error;
+        return fullWeightStep;
     }
-    public double GetWeightDerivativeX(int index, double[] xs)
+
+    public double FullBiasStep(double error, Func<double> GetChainFactor)
+    {
+        double fullBiasStep = BiasDerivative() * GetChainFactor() * error;
+        return fullBiasStep;
+    }
+
+
+    private double GetWeightDerivativeW(int index)
+    {
+        if (index < 0 || index >= Weights.Length || Xs == null)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights and inputs must be processed.");
+        }
+        return Xs[index] * ActivationDerivative(Sum);
+    }
+    private double GetWeightDerivativeX(int index)
     {
         if (index < 0 || index >= Weights.Length)
         {
             throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
         }
-        return Weights[index] * ActivationDerivative(xs[index] * Weights[index] + Bias[0]);
+        return Weights[index] * ActivationDerivative(Sum);
     }
 
     public double BiasDerivative()
     {
         return 1;
     }
-    #endregion
-    #region Static Activation Functions and derivatives
-    public static double UnitActivation(double x) => x;
-    public static double UnitActivationDerivative(double x) => 1;
-
-    public static double SoftPlus(double x)
-    {
-        return Math.Log(1 + Math.Exp(x));
-    }
-    public static double SoftPlusDerivative(double x)
-    {
-        return Sigmoid(x);
-    }
-    public static double Sigmoid(double x)
-    {
-        return 1 / (1 + Math.Exp(-x));
-    }
-    public static double SigmoidDerivative(double x)
-    {
-        return x * (1 - x);
-    }
-
 
     #endregion
 }
