@@ -4,7 +4,13 @@ namespace BackPropagation.NNLib;
 
 public interface INeuralNetwork
 {
+    public ILayer[] Layers { get; set; }
+    public double[][] Ys { get; set; }
+    public double[][][] Weigths { get; set; }
+    public double[][][] Biases { get; set; }
+
     double[] Predict(double[] inputs);
+    public double[][][] BackwardPass(double[] inputs, double[] errors);
 }
 
 public class NeuralNetwork : INeuralNetwork
@@ -21,11 +27,19 @@ public class NeuralNetwork : INeuralNetwork
         Ys = ys;
         Weigths = weights;
         Biases = biases;
-        Layers = new ILayer[weights.Length];
-        for (int i = 0; i < weights.Length; i++)
+        Layers = new ILayer[weights.Length + 2]; // +2 for the input and output layers
+
+        for (int i = 0; i < Layers.Length; i++)
         {
-            Layers[i] = LayerFactory.Create(NodeFactory, weights[i], biases[i], activationFunctions?[i] ?? Node.SoftPlus);
+            var layerType = i == 0 ? LayerType.Input : i == Layers.Length - 1 ? LayerType.Output : LayerType.Hidden;
+            Layers[i] = LayerFactory.Create(NodeFactory, weights[i], biases[i], activationFunctions?[i] ?? Node.SoftPlus, layerType);
+            if (i > 0)
+            {
+                Layers[i].PreviousLayer = Layers[i - 1];
+                Layers[i - 1].NextLayer = Layers[i];
+            }
         }
+        Layers[weights.Length] = LayerFactory.Create(NodeFactory, weights[^1], biases[^1], activationFunctions?[^1] ?? Node.SoftPlus, LayerType.Output);
     }
     public double[] Predict(double[] inputs)
     {
@@ -37,6 +51,17 @@ public class NeuralNetwork : INeuralNetwork
             Ys[i++] = outputs;
         }
         return outputs;
+    }
+
+    public double[][][] BackwardPass(double[] inputs, double[] errors)
+    {
+        double[][][] weightUpdates = new double[Layers.Length][][];
+        for (int i = Layers.Length - 1; i >= 0; i--)
+        {
+            var layer = Layers[i];
+            weightUpdates[i] = layer.GetWeightUpdates(inputs, errors);
+        }
+        return weightUpdates;
     }
 
 }
