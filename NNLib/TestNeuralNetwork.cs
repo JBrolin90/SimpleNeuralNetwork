@@ -4,10 +4,10 @@ using System.Net.WebSockets;
 
 namespace BackPropagation.NNLib;
 
-public struct NodeSteps
+public struct NodeSteps(int weightCount)
 {
-    public double[] WeightSteps;
-    public double BiasStep;
+    public double[] WeightSteps = new double[weightCount];
+    public double BiasStep = 0;
 }
 
 public class TestNeuralNetwork : NeuralNetwork
@@ -44,7 +44,7 @@ public class TestNeuralNetwork : NeuralNetwork
         int i = 0;
         foreach (var layer in Layers)
         {
-            nodeSteps[i++] = layer.Backward(nodeSteps[i], dSSR);
+            nodeSteps[i++] = layer.Backward(dSSR);
         }
     }
 

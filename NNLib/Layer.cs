@@ -35,14 +35,13 @@ public class LayerFactory : ILayerFactory
 public interface ILayer
 {
     public INode[] Nodes { get; set; }
-    public ILayer? PreviousLayer { get; set; }
-    public ILayer? NextLayer { get; set; }
+    public ILayer PreviousLayer { get; set; }
+    public ILayer NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
-    // public double[][] Backward();
-    NodeSteps[] Backward(NodeSteps[] nodeSteps, double dSSR);
-    static double UnitActivation(double x) => x;
-    static double SoftPlus(double x) => Math.Log(1 + Math.Exp(x));
+    NodeSteps[] Backward(double dSSR);
+    double GetWeightChainFactor(int index);
+    double GetBiasChainFactor(int inputIndex);
 }
 #endregion
 
@@ -56,9 +55,40 @@ public class Layer : ILayer
     public double[][] Biases { get; set; }
     public double[] Ys { get; set; }
     Func<double, double>? ActivationFunction { get; set; }
-    public ILayer? PreviousLayer { get; set; } = null;
-    public ILayer? NextLayer { get; set; } = null;
+    private ILayer? prevLayer = null!;
+    public ILayer PreviousLayer
+    {
+        get
+        {
+            if (prevLayer == null)
+            {
+                throw new InvalidOperationException("PreviousLayer is not set. Ensure to set it before accessing.");
+            }
+            return prevLayer;
+        }
+        set
+        {
+            prevLayer = value ?? throw new ArgumentNullException(nameof(value), "PreviousLayer cannot be null.");
+        }
+    }
+    private ILayer nextLayer = null!;
+    public ILayer NextLayer
+    {
+        get
+        {
+            if (nextLayer == null)
+            {
+                throw new InvalidOperationException("NextLayer is not set. Ensure to set it before accessing.");
+            }
+            return nextLayer;
+        }
+        set
+        {
+            nextLayer = value ?? throw new ArgumentNullException(nameof(value), "NextLayer cannot be null.");
+        }
+    }
     #endregion
+    #region Constructors
     public Layer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
     {
         Weights = weights;
@@ -68,10 +98,11 @@ public class Layer : ILayer
         ActivationFunction = activationFunction;
         for (int i = 0; i < Biases.Length; i++)
         {
-            Nodes[i] = NodeFactory.Create(Weights[i], Biases[i], ActivationFunction);
+            Nodes[i] = NodeFactory.Create(this, i, Weights[i], Biases[i], ActivationFunction);
         }
     }
-
+    #endregion
+    #region Forward
     public virtual double[] Forward(double[] inputs)
     {
         Inputs = inputs;
@@ -81,29 +112,39 @@ public class Layer : ILayer
         }
         return Ys;
     }
+    #endregion
+    #region Backward
 
-    int currentNodeIndex = 0;
-    public double GetChainFactor()
-    {
-        double factor = 0;
-        for (int i = 0; i < NextLayer.Nodes.Length; i++)
-        {
-            factor += NextLayer.Nodes[i].GetChainFactor();
-        }
-        return factor;
-    }
-
-
-    public NodeSteps[] Backward(NodeSteps[] nodeSteps, double dSSR)
+    public NodeSteps[] Backward(double dSSR)
     {
         NodeSteps[] steps = new NodeSteps[Nodes.Length];
         for (int i = 0; i < Nodes.Length; i++)
         {
-            currentNodeIndex = i;
-            // Calculate the chain factor for the current node
-            steps[i] = Nodes[i].Backward(nodeSteps[i], dSSR, GetChainFactors);
+            steps[i] = Nodes[i].Backward(dSSR);
         }
         return steps;
     }
+
+    public double GetWeightChainFactor(int inputIndex)
+    {
+        double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
+        double otherChainFactor = 0;
+        for (int i = 0; i < Nodes.Length; i++)
+        {
+            otherChainFactor += Nodes[i].GetWeightDerivativeW(i);
+        }
+        return chainFactor * otherChainFactor;
+    }
+    public double GetBiasChainFactor(int inputIndex)
+    {
+        double chainFactor = NextLayer.GetBiasChainFactor(inputIndex);
+        double otherChainFactor = 0;
+        for (int i = 0; i < Nodes.Length; i++)
+        {
+            otherChainFactor += Nodes[i].BiasDerivative();
+        }
+        return chainFactor * otherChainFactor;
+    }
+    #endregion
 
 }

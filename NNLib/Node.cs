@@ -5,14 +5,14 @@ namespace BackPropagation.NNLib;
 #region Factory
 public interface INodeFactory
 {
-    INode Create(double[] weights, double[] bias, Func<double, double>? activationFunction = null);
+    INode Create(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null);
 }
 
 public class NodeFactory : INodeFactory
 {
-    public INode Create(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
+    public INode Create(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
-        return new Node(weights, bias, activationFunction);
+        return new Node(layer, index, weights, bias, activationFunction);
     }
 }
 
@@ -22,28 +22,35 @@ public interface INode
 {
     double[] Weights { get; set; }
     double[] Bias { get; set; }
+    public double Sum { get; set; }
     Func<double, double> ActivationFunction { get; set; }
     Func<double, double> ActivationDerivative { get; set; }
-    NodeSteps Backward(NodeSteps nodeSteps, double error, Func<double> GetChainFactor);
-    double GetChainFactor();
     double ProcessInputs(double[] inputs);
+    NodeSteps Backward(double error);
+    double GetWeightDerivativeW(int index);
+
+    double BiasDerivative();
 }
 
 public class Node : INode
 {
     #region Properties
+    public ILayer Layer { get; set; } = null!; // Reference to the layer this node belongs to
+    public int Index { get; set; } = -1; // Index of the node in the layer
     public double[] Weights { get; set; }
     public double[] Bias { get; set; }
     public double[] WeightDerivatives { get; set; }
     public double Sum { get; set; } = 0;
     public double Y { get; set; } = 0;
-    public double[]? Xs { get; set; }
+    public double[] Xs { get; set; }
     public Func<double, double> ActivationFunction { get; set; } = ActivationFunctions.SoftPlus;
     public Func<double, double> ActivationDerivative { get; set; } = ActivationFunctions.SoftPlusDerivative;
     #endregion
     #region Constructors
-    public Node(double[] weights, double[] bias, Func<double, double>? activationFunction = null)
+    public Node(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
+        Layer = layer;
+        Index = index;
         Weights = weights;
         Bias = bias; // store bias by reference using array
         WeightDerivatives = new double[weights.Length];
@@ -78,68 +85,31 @@ public class Node : INode
     #endregion
     #region Backpropagation
 
-    public NodeSteps Backward(NodeSteps nodeSteps, double error, Func<double> GetChainFactor)
+    public NodeSteps Backward(double error)
     {
-        if (Xs == null)
-        {
-            throw new InvalidOperationException("Inputs must be processed before backpropagation.");
-        }
-
-        nodeSteps.WeightSteps = new double[Weights.Length];
+        NodeSteps nodeSteps = new(Weights.Length);
         for (int i = 0; i < Weights.Length; i++)
         {
-            nodeSteps.WeightSteps[i] = GetFullWeightStep(i, error, GetChainFactor) * error;
+            nodeSteps.WeightSteps[i] = GetWeightDerivativeX(i) * error * Layer.GetWeightChainFactor(i);
         }
-        nodeSteps.BiasStep = BiasDerivative() * error;
+        nodeSteps.BiasStep = BiasDerivative() * error * Layer.GetWeightChainFactor(-1);
 
         return nodeSteps;
     }
-    public double GetChainFactor()
+
+
+    public double GetWeightDerivativeW(int index)
     {
-        double x = 0;
-        x += GetWeightDerivativeX(i) * ActivationDerivative(Sum);
-        return x;
-
-    }
-
-    public double GetFullWeightStep(int index, double error, Func<double> GetChainFactor)
-    {
-        double[] fullWeightsStep = new double[Weights.Length];
-        if (index < 0 || index >= Weights.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
-        }
-        fullWeightStep = GetWeightDerivativeW(index) * GetChainFactor() * error;
-        return fullWeightStep;
-    }
-
-    public double FullBiasStep(double error, Func<double> GetChainFactor)
-    {
-        double fullBiasStep = BiasDerivative() * GetChainFactor() * error;
-        return fullBiasStep;
-    }
-
-
-    private double GetWeightDerivativeW(int index)
-    {
-        if (index < 0 || index >= Weights.Length || Xs == null)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights and inputs must be processed.");
-        }
         return Xs[index] * ActivationDerivative(Sum);
     }
     private double GetWeightDerivativeX(int index)
     {
-        if (index < 0 || index >= Weights.Length)
-        {
-            throw new ArgumentOutOfRangeException(nameof(index), "Index must be within the range of weights.");
-        }
         return Weights[index] * ActivationDerivative(Sum);
     }
 
     public double BiasDerivative()
     {
-        return 1;
+        return 1 * ActivationDerivative(Sum);
     }
 
     #endregion
