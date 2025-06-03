@@ -92,7 +92,7 @@ public class Node : INode
         {
             nodeSteps.WeightSteps[i] = GetWeightDerivativeX(i) * error * Layer.GetWeightChainFactor(i);
         }
-        nodeSteps.BiasStep = BiasDerivative() * error * Layer.GetWeightChainFactor(-1);
+        nodeSteps.BiasStep = BiasDerivative() * error * Layer.GetBiasChainFactor(-1);
 
         return nodeSteps;
     }

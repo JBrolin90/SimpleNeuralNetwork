@@ -21,7 +21,7 @@ public class LayerFactory : ILayerFactory
     {
         if (layerType == LayerType.Input)
         {
-            throw new NotImplementedException("Input layer creation is not yet implemented. Use a different layer type.");
+            return new InputLayer(/*factory, weights, biases, activationFunctions*/);
         }
         if (layerType == LayerType.Output)
         {
@@ -129,9 +129,9 @@ public class Layer : ILayer
     {
         double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
         double otherChainFactor = 0;
-        for (int i = 0; i < Nodes.Length; i++)
+        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            otherChainFactor += Nodes[i].GetWeightDerivativeW(i);
+            otherChainFactor += Nodes[nodeIndex].GetWeightDerivativeW(inputIndex);
         }
         return chainFactor * otherChainFactor;
     }
@@ -139,12 +139,11 @@ public class Layer : ILayer
     {
         double chainFactor = NextLayer.GetBiasChainFactor(inputIndex);
         double otherChainFactor = 0;
-        for (int i = 0; i < Nodes.Length; i++)
+        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            otherChainFactor += Nodes[i].BiasDerivative();
+            otherChainFactor += Nodes[nodeIndex].BiasDerivative();
         }
         return chainFactor * otherChainFactor;
     }
     #endregion
-
 }

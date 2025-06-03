@@ -51,6 +51,7 @@ public class OutputLayer : ILayer
     public double[] Forward(double[] inputs)
     {
         Inputs = inputs;
+        Ys = new double[inputs.Length];
         for (int i = 0; i < inputs.Length; i++)
         {
             Ys[i] = inputs.Sum();  //Nodes[i].ProcessInputs(inputs);

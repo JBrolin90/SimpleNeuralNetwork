@@ -24,7 +24,7 @@ public class BackPropagator
         }
 
         // Backward pass
-        double[][][] weightUpdates = NN.BackwardPass(inputs, errors);
+        //double[][][] weightUpdates = NN.BackwardPass(inputs, errors);
 
         // Update weights and biases
         // Iterate through layers in reverse order to apply weight updates        
@@ -36,7 +36,7 @@ public class BackPropagator
                 var node = layer.Nodes[j];
                 for (int k = 0; k < node.Weights.Length; k++)
                 {
-                    node.Weights[k] += weightUpdates[i][j][k];
+                    // node.Weights[k] += weightUpdates[i][j][k];
                 }
                 for (int k = 0; k < node.Bias.Length; k++)
                 {
