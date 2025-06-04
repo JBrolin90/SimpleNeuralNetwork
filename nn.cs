@@ -8,7 +8,7 @@ class Data
 }
 
 
-class NeuralNetwork
+class NeuralNetworkXX
 {
     readonly bool log = true;
     public double SSR = 0.0;
@@ -17,10 +17,10 @@ class NeuralNetwork
     public double dSSRw4 = 0.0;
     public const double trainingSize = 0.1;
     #region Layers
-    readonly Layer inputLayer;
-    readonly Layer layer1;
-    readonly Layer layer2;
-    readonly Layer outputLayer;
+    readonly OldLayer inputLayer;
+    readonly OldLayer layer1;
+    readonly OldLayer layer2;
+    readonly OldLayer outputLayer;
     #endregion
 
     readonly Data[] inputs = [
@@ -28,9 +28,9 @@ class NeuralNetwork
         new Data() { input = 0.5, observed = 1.0 },
         new Data() { input = 1.0, observed = 0.0 }
     ];
-    public NeuralNetwork()
+    public NeuralNetworkXX()
     {
-        inputLayer = new(1, 1, Layer.UnitActivation);
+        inputLayer = new(1, 1, OldLayer.UnitActivation);
         inputLayer.weights[0][0] = 1;
         inputLayer.biases[0][0] = 0;
 
@@ -40,13 +40,13 @@ class NeuralNetwork
         layer1.biases[0][0] = -1.43;
         layer1.biases[1][0] = 0.57;
 
-        layer2 = new(2, 1, Layer.UnitActivation);
+        layer2 = new(2, 1, OldLayer.UnitActivation);
         layer2.weights[0][0] = 0.36;
         layer2.weights[0][1] = 0.63;
         layer2.biases[0][0] = 0;
         layer2.biases[0][1] = 0;
 
-        outputLayer = new(1, 1, Layer.UnitActivation);
+        outputLayer = new(1, 1, OldLayer.UnitActivation);
         outputLayer.weights[0][0] = 1;
         outputLayer.biases[0][0] = 0;
 
@@ -103,7 +103,7 @@ class NeuralNetwork
     }
 }
 
-class Layer
+class OldLayer
 {
     readonly bool log = false;
     public double[][] weights;
@@ -113,7 +113,7 @@ class Layer
     public double[] deltas;
     public Func<double, double> activationFunction;
 
-    public Layer(int inputSize, int outputSize, Func<double, double>? activationFunction = null)
+    public OldLayer(int inputSize, int outputSize, Func<double, double>? activationFunction = null)
     {
         activationFunction ??= SoftPlus;
         this.activationFunction = activationFunction;

@@ -1,62 +1,43 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using BackPropagation.NNLib;
+// See https://aka.ms/new-console-template for more information
+Console.WriteLine("Hello, BackPropagation learners!");
 
-// declare an array of real numbers
-double[] w = new double[] { 1, 3.34, -3.53, -1.22, -2.3 };
-double[] b = new double[5] { 0, -1.43, 0.57, 0, 0.0 };
-double[] x = new double[6] { 0.0, 0.0, 0.0, 0.0, 0.0, 0.0 };
+double[] inputs = [0, 0.5, 1];
+double[] observed = [0, 1, 0];
 
-Data[] inputs = new Data[3];
-inputs[0] = new Data() { input = 0.0, observed = 0.0 };
-inputs[1] = new Data() { input = 0.5, observed = 1.0 };
-inputs[2] = new Data() { input = 1.0, observed = 0.0 };
-
-
-// NeuralNetwork nn = new();
-// for (int i = 0; i < 1000; i++)
-// {
-//     nn.FeedForward(inputs);
-// }
+double[][][] weights = [
+    [],
+    [[2.74], [-1.13]],
+    [[0.36, 0.63]],
+    []
+    ];
+double[][][] biases = [[], [[0], [0]], [[0]], []];
+double[][] ys = [[0,0],[0,0],[0, 0], [0, 0]];
 
 
-static double SoftPlus(double x)
+Func<double, double>[] activationFunctions = [
+    ActivationFunctions.Unit, // Activation function for the second layer
+    ActivationFunctions.SoftPlus, // Activation function for the first layer
+    ActivationFunctions.Unit, // Activation function for the second layer
+    ActivationFunctions.Unit // Activation function for the second layer
+];
+
+
+// NeuralNetwork nn = new(new LayerFactory(), new NodeFactory(),
+//     weights, biases, ys, activationFunctions, 0.01);
+
+
+// double[] output0 = nn.Predict([0]);
+// double[] output1 = nn.Predict([0.5]);
+// double[] output2 = nn.Predict([1.0]);
+// Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]}");
+
+
+
+TestNeuralNetwork testNN = new(new LayerFactory(), new NodeFactory(),
+    weights, biases, ys, 0.01, activationFunctions);
+for (int i = 0; i < 20000; i++)
 {
-    double result = Math.Log(1 + Math.Exp(x));
-    return result;
+    testNN.Train(inputs, observed);
 }
-
-double SSR = 0.0;
-
-
-foreach (Data data in inputs)
-{
-    double input = data.input;
-    x[1] = SoftPlus(input * w[1] + b[1]);
-    x[2] = SoftPlus(input * w[2] + b[2]);
-
-    x[3] = x[1] * w[3];
-    x[4] = x[2] * w[4];
-
-    x[5] = x[3] + x[4];
-
-    double predicted = x[5] + b[3];
-    data.loss = predicted - data.observed;
-    data.lossSquared = Math.Pow(data.loss, 2);
-    SSR += data.lossSquared;
-
-    // Console.WriteLine("output = " + predicted);
-    // Console.WriteLine("Observed = " + data.observed);
-    // Console.WriteLine("loss = " + data.loss);
-    // Console.WriteLine("loss squared = " + data.lossSquared);
-    // Console.WriteLine();
-    // Console.WriteLine("===================================");
-    // Console.WriteLine();
-
-}
-Console.WriteLine("Sum of Squared Residuals = " + SSR);
-Console.WriteLine("===================================");
-Console.WriteLine();
-
-
-
-
+Console.WriteLine($"SSR: {testNN.SSR}");
