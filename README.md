@@ -89,6 +89,35 @@ The neural network implementation follows these key principles:
    dotnet run
    ```
 
+## Testing
+
+This project includes a comprehensive test suite built with xUnit that covers all neural network components.
+
+### Test Coverage
+- **Activation Functions**: Unit, SoftPlus, Sigmoid, ReLU functions and their derivatives
+- **Neural Network**: Constructor validation, prediction methods, error handling  
+- **Training**: Backpropagation algorithm, weight updates, convergence testing
+- **Factory Pattern**: NodeFactory and LayerFactory implementations
+- **Data Structures**: NodeSteps for gradient calculations
+- **Integration Tests**: End-to-end neural network workflows
+
+### Running Tests
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with detailed output
+dotnet test --verbosity normal
+
+# Run specific test class
+dotnet test --filter "FullyQualifiedName~ActivationFunctionTests"
+
+# Run tests in watch mode (for development)
+dotnet watch test
+```
+
+For detailed testing instructions, see [`BackPropagation.Tests/README.md`](BackPropagation.Tests/README.md).
+
 ## Requirements
 - .NET 9.0 SDK or later
 - Linux, Windows, or macOS
