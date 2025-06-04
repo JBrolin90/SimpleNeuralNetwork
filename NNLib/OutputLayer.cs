@@ -58,9 +58,8 @@ public class OutputLayer : ILayer
         }
         return Ys;
     }
-    public NodeSteps[] Backward(double dSSR)
+    public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
     {
-        NodeSteps[] steps = new NodeSteps[Nodes.Length];
         return steps;
     }
 
@@ -68,7 +67,7 @@ public class OutputLayer : ILayer
     {
         return 1;
     }
-    public double GetBiasChainFactor(int _)
+    public double GetBiasChainFactor()
     {
         return 1;
     }

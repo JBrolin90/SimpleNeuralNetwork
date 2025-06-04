@@ -26,7 +26,7 @@ public interface INode
     Func<double, double> ActivationFunction { get; set; }
     Func<double, double> ActivationDerivative { get; set; }
     double ProcessInputs(double[] inputs);
-    NodeSteps Backward(double error);
+    NodeSteps Backward(double error, NodeSteps steps);
     double GetWeightDerivativeW(int index);
 
     double BiasDerivative();
@@ -63,9 +63,9 @@ public class Node : INode
         {
             ActivationDerivative = ActivationFunctions.SigmoidDerivative;
         }
-        else if (ActivationDerivative == ActivationFunctions.Unit)
+        else if (ActivationFunction == ActivationFunctions.Unit)
         {
-            ActivationFunction = ActivationFunctions.UnitDerivative;
+            ActivationDerivative = ActivationFunctions.UnitDerivative;
         }
     }
     #endregion
@@ -85,24 +85,25 @@ public class Node : INode
     #endregion
     #region Backpropagation
 
-    public NodeSteps Backward(double error)
+    public NodeSteps Backward(double error, NodeSteps nodeSteps)
     {
-        NodeSteps nodeSteps = new(Weights.Length);
         for (int i = 0; i < Weights.Length; i++)
         {
-            nodeSteps.WeightSteps[i] = GetWeightDerivativeX(i) * error * Layer.GetWeightChainFactor(i);
+            var s = error * Layer.NextLayer.GetWeightChainFactor(Index) * GetWeightDerivativeX(i);
+            nodeSteps.WeightSteps[i] += error * Layer.NextLayer.GetWeightChainFactor(Index) * GetWeightDerivativeX(i);
         }
-        nodeSteps.BiasStep = BiasDerivative() * error * Layer.GetBiasChainFactor(-1);
+        var b = error * Layer.NextLayer.GetWeightChainFactor(Index) * BiasDerivative();
+        nodeSteps.BiasStep += error * Layer.NextLayer.GetWeightChainFactor(Index) * BiasDerivative();
 
         return nodeSteps;
     }
 
 
-    public double GetWeightDerivativeW(int index)
+    public double GetWeightDerivativeX(int index)
     {
         return Xs[index] * ActivationDerivative(Sum);
     }
-    private double GetWeightDerivativeX(int index)
+    public double GetWeightDerivativeW(int index)
     {
         return Weights[index] * ActivationDerivative(Sum);
     }

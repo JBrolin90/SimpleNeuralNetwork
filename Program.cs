@@ -5,8 +5,13 @@ Console.WriteLine("Hello, BackPropagation learners!");
 double[] inputs = [0, 0.5, 1];
 double[] observed = [0, 1, 0];
 
-double[][][] weights = [[],[[3.34], [-3.53]], [[0.36, 0.63]],[]];
-double[][][] biases = [[], [ [-1.43], [0.57]], [[0]], []];
+double[][][] weights = [
+    [],
+    [[2.74], [-1.13]],
+    [[0.36, 0.63]],
+    []
+    ];
+double[][][] biases = [[], [[0], [0]], [[0]], []];
 double[][] ys = [[0,0],[0,0],[0, 0], [0, 0]];
 
 
@@ -31,8 +36,8 @@ Func<double, double>[] activationFunctions = [
 
 TestNeuralNetwork testNN = new(new LayerFactory(), new NodeFactory(),
     weights, biases, ys, 0.01, activationFunctions);
-for (int i = 0; i < 1; i++)
+for (int i = 0; i < 20000; i++)
 {
-    testNN.Test(inputs, observed);
+    testNN.Train(inputs, observed);
 }
 Console.WriteLine($"SSR: {testNN.SSR}");

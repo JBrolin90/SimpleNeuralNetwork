@@ -12,12 +12,12 @@ public enum LayerType
 }
 public interface ILayerFactory
 {
-    ILayer Create(INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden);
+    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden);
 }
 
 public class LayerFactory : ILayerFactory
 {
-    public ILayer Create(INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden)
+    public ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden)
     {
         if (layerType == LayerType.Input)
         {
@@ -27,7 +27,7 @@ public class LayerFactory : ILayerFactory
         {
             return new OutputLayer(factory, weights, biases, activationFunctions);
         }
-        return new Layer(factory, weights, biases, activationFunctions);
+        return new Layer(index, factory, weights, biases, activationFunctions);
     }
 }
 #endregion
@@ -39,9 +39,9 @@ public interface ILayer
     public ILayer NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
-    NodeSteps[] Backward(double dSSR);
+    NodeSteps[] Backward(double dSSR, NodeSteps[] steps);
     double GetWeightChainFactor(int index);
-    double GetBiasChainFactor(int inputIndex);
+    double GetBiasChainFactor();
 }
 #endregion
 
@@ -49,6 +49,7 @@ public interface ILayer
 public class Layer : ILayer
 {
     #region Properties
+    public int Index { get; set; } = -1; // Index of the layer in the network
     public INode[] Nodes { get; set; }
     public double[]? Inputs { get; set; }
     public double[][] Weights { get; set; }
@@ -89,8 +90,9 @@ public class Layer : ILayer
     }
     #endregion
     #region Constructors
-    public Layer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
+    public Layer(int index, INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
     {
+        Index = index;
         Weights = weights;
         Biases = biases;
         Nodes = new INode[Biases.Length];
@@ -115,12 +117,11 @@ public class Layer : ILayer
     #endregion
     #region Backward
 
-    public NodeSteps[] Backward(double dSSR)
+    public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
     {
-        NodeSteps[] steps = new NodeSteps[Nodes.Length];
         for (int i = 0; i < Nodes.Length; i++)
         {
-            steps[i] = Nodes[i].Backward(dSSR);
+            steps[i] = Nodes[i].Backward(dSSR, steps[i]);
         }
         return steps;
     }
@@ -135,9 +136,9 @@ public class Layer : ILayer
         }
         return chainFactor * otherChainFactor;
     }
-    public double GetBiasChainFactor(int inputIndex)
+    public double GetBiasChainFactor()
     {
-        double chainFactor = NextLayer.GetBiasChainFactor(inputIndex);
+        double chainFactor = NextLayer.GetBiasChainFactor();
         double otherChainFactor = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {

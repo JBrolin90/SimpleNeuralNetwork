@@ -41,9 +41,8 @@ public class InputLayer : ILayer
     public double[]? Inputs { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
     #endregion
 
-    public NodeSteps[] Backward(double dSSR)
+    public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
     {
-        NodeSteps[] steps = new NodeSteps[Nodes.Length];
         return steps;
     }
 
@@ -52,7 +51,7 @@ public class InputLayer : ILayer
         return inputs; // In an input layer, the forward pass simply returns the inputs as outputs.
     }
 
-    public double GetBiasChainFactor(int inputIndex)
+    public double GetBiasChainFactor()
     {
         throw new NotImplementedException();
     }

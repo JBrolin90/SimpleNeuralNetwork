@@ -21,7 +21,7 @@ public class NeuralNetwork : INeuralNetwork
     #endregion
     #region Constructors
     public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[]? activationFunctions = null,
+                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions,
                         double learningRate = 0.01)
     {
         Ys = ys;
@@ -32,7 +32,7 @@ public class NeuralNetwork : INeuralNetwork
         for (int i = 0; i < Layers.Length; i++)
         {
             var layerType = i == 0 ? LayerType.Input : i == Layers.Length - 1 ? LayerType.Output : LayerType.Hidden;
-            Layers[i] = LayerFactory.Create(NodeFactory, weights[i], biases[i], activationFunctions?[i] ?? ActivationFunctions.SoftPlus, layerType);
+            Layers[i] = LayerFactory.Create(i, NodeFactory, weights[i], biases[i], activationFunctions[i], layerType);
             if (i > 0)
             {
                 Layers[i].PreviousLayer = Layers[i - 1];
