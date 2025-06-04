@@ -24,6 +24,8 @@ public class NeuralNetwork : INeuralNetwork
                         double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions,
                         double learningRate = 0.01)
     {
+        if (LayerFactory == null) throw new ArgumentNullException(nameof(LayerFactory), "LayerFactory cannot be null");
+        if (NodeFactory == null) throw new ArgumentNullException(nameof(NodeFactory), "NodeFactory cannot be null");
         Ys = ys;
         Weigths = weights;
         Biases = biases;

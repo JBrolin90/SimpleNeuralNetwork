@@ -12,6 +12,10 @@ public class NodeFactory : INodeFactory
 {
     public INode Create(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
+        if (layer == null)
+        {
+            throw new ArgumentNullException(nameof(layer), "Layer cannot be null");
+        }
         return new Node(layer, index, weights, bias, activationFunction);
     }
 }
