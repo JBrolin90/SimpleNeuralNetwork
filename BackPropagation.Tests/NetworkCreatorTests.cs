@@ -19,7 +19,7 @@ public class NetworkCreatorTests
         ];
 
         // Act
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(1,layerSizes, activationFunctions);
 
         // Assert
         Assert.NotNull(creator.Weights);
@@ -56,7 +56,7 @@ public class NetworkCreatorTests
         ];
 
         // Act
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(1, layerSizes, activationFunctions);
 
         // Assert
         Assert.NotNull(creator.Weights);
@@ -73,6 +73,7 @@ public class NetworkCreatorTests
     public void Constructor_VariousNetworkSizes_ShouldCreateCorrectStructure(int[] layerSizes)
     {
         // Arrange
+        int inputs = layerSizes[0]; // Use first layer size as input count
         var activationFunctions = new Func<double, double>[layerSizes.Length];
         for (int i = 0; i < layerSizes.Length; i++)
         {
@@ -80,7 +81,7 @@ public class NetworkCreatorTests
         }
 
         // Act
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Assert
         Assert.Equal(layerSizes.Length, creator.Weights.Length);
@@ -98,7 +99,8 @@ public class NetworkCreatorTests
     public void Constructor_ShouldInitializeWeightsAndBiasesToZero()
     {
         // Arrange
-        int[] layerSizes = [2, 3, 1];
+        int inputs = 2;
+        int[] layerSizes = [3, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
@@ -106,7 +108,7 @@ public class NetworkCreatorTests
         ];
 
         // Act
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Assert
         // Check that all weights in hidden layers are initialized to 0
@@ -135,14 +137,15 @@ public class NetworkCreatorTests
     public void RandomizeWeights_ShouldModifyWeightValues()
     {
         // Arrange
-        int[] layerSizes = [2, 3, 2, 1];
+        int inputs = 2;
+        int[] layerSizes = [3, 2, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Sigmoid,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Store original weights (should all be 0)
         var originalWeights = new double[creator.Weights.Length][][];
@@ -185,13 +188,14 @@ public class NetworkCreatorTests
     public void RandomizeWeights_ShouldProduceValuesInExpectedRange()
     {
         // Arrange
-        int[] layerSizes = [2, 4, 1];
+        int inputs = 2;
+        int[] layerSizes = [4, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Act
         creator.RandomizeWeights();
@@ -216,13 +220,14 @@ public class NetworkCreatorTests
     public void RandomizeWeights_MultipleCallsShouldProduceDifferentValues()
     {
         // Arrange
-        int[] layerSizes = [2, 3, 1];
+        int inputs = 2;
+        int[] layerSizes = [3, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Act
         creator.RandomizeWeights();
@@ -240,13 +245,14 @@ public class NetworkCreatorTests
     public void CreateNetwork_ShouldReturnValidNeuralNetworkTrainer()
     {
         // Arrange
-        int[] layerSizes = [2, 3, 1];
+        int inputs = 2;
+        int[] layerSizes = [3, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Act
         var network = creator.CreateNetwork();
@@ -262,13 +268,14 @@ public class NetworkCreatorTests
     public void CreateNetwork_ShouldUseCurrentWeightsAndBiases()
     {
         // Arrange
-        int[] layerSizes = [1, 2, 1];
+        int inputs = 1;
+        int[] layerSizes = [2, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
         
         // Modify weights manually
         creator.Weights[1][0][0] = 2.5;
@@ -287,13 +294,14 @@ public class NetworkCreatorTests
     public void CreateNetwork_WithRandomizedWeights_ShouldCreateTrainableNetwork()
     {
         // Arrange
-        int[] layerSizes = [1, 2, 1];
+        int inputs = 1;
+        int[] layerSizes = [2, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
         creator.RandomizeWeights();
 
         // Act
@@ -318,12 +326,13 @@ public class NetworkCreatorTests
     public void CreateNetwork_VariousArchitectures_ShouldCreateValidNetworks(int[] layerSizes)
     {
         // Arrange
+        int inputs = layerSizes[0]; // Use first layer size as input count
         var activationFunctions = new Func<double, double>[layerSizes.Length];
         for (int i = 0; i < layerSizes.Length; i++)
         {
             activationFunctions[i] = ActivationFunctions.Unit;
         }
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
         creator.RandomizeWeights();
 
         // Act
@@ -349,13 +358,14 @@ public class NetworkCreatorTests
     public void Properties_ShouldBeSettableAndGettable()
     {
         // Arrange
+        int inputs = 2;
         int[] layerSizes = [2, 2, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Act & Assert - Test property setters
         var newWeights = new double[][][] { [], [[1.0, 2.0], [3.0, 4.0]], [] };
@@ -383,13 +393,14 @@ public class NetworkCreatorTests
     public void CreateNetwork_ShouldUseDefaultLearningRate()
     {
         // Arrange
-        int[] layerSizes = [1, 2, 1];
+        int inputs = 1;
+        int[] layerSizes = [2, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
         // Act
         var network = creator.CreateNetwork();
@@ -405,32 +416,33 @@ public class NetworkCreatorTests
     public void NetworkCreator_Integration_ShouldCreateTrainableNetwork()
     {
         // Arrange
-        int[] layerSizes = [1, 3, 1];
+        int inputs = 1;
+        int[] layerSizes = [3, 1];
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
             ActivationFunctions.SoftPlus,
             ActivationFunctions.Unit
         ];
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
         creator.RandomizeWeights();
 
         // Act
         var network = creator.CreateNetwork();
-        double[] inputs = [0.5];
+        double[] testInputs = [0.5];
         double[] expected = [1.0];
 
         // Get initial prediction
-        var initialPrediction = network.Predict(inputs);
+        var initialPrediction = network.Predict(testInputs);
         var initialSSR = network.SSR;
 
         // Train the network
         for (int i = 0; i < 10; i++)
         {
-            network.Train(inputs, expected);
+            network.Train(testInputs, expected);
         }
 
         // Get prediction after training
-        var trainedPrediction = network.Predict(inputs);
+        var trainedPrediction = network.Predict(testInputs);
 
         // Assert
         Assert.NotNull(initialPrediction);

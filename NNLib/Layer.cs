@@ -12,7 +12,7 @@ public enum LayerType
 }
 public interface ILayerFactory
 {
-    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]? expectedOutputs = null);
+    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]?  expectedOutputs = null);
 }
 
 public class LayerFactory : ILayerFactory
@@ -21,11 +21,11 @@ public class LayerFactory : ILayerFactory
     {
         if (layerType == LayerType.Input)
         {
-            return new InputLayer(/*factory, weights, biases, activationFunctions*/);
+            return new InputLayer(index, factory, weights, biases, activationFunctions);
         }
         if (layerType == LayerType.Output)
         {
-            return new OutputLayer(factory, weights, biases, activationFunctions, expectedOutputs?.Length ?? 1);
+            return new OutputLayer(index, factory, weights, biases, activationFunctions);
         }
         return new Layer(index, factory, weights, biases, activationFunctions);
     }
@@ -35,8 +35,8 @@ public class LayerFactory : ILayerFactory
 public interface ILayer
 {
     public INode[] Nodes { get; set; }
-    public ILayer PreviousLayer { get; set; }
-    public ILayer NextLayer { get; set; }
+    public ILayer? PreviousLayer { get; set; }
+    public ILayer? NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
     NodeSteps[] Backward(double dSSR, NodeSteps[] steps);
@@ -56,8 +56,8 @@ public class Layer : ILayer
     public double[][] Biases { get; set; }
     public double[] Ys { get; set; }
     Func<double, double>? ActivationFunction { get; set; }
-    private ILayer? prevLayer = null!;
-    public ILayer PreviousLayer
+    protected ILayer? prevLayer = null!;
+    public virtual ILayer? PreviousLayer
     {
         get
         {
@@ -72,8 +72,8 @@ public class Layer : ILayer
             prevLayer = value ?? throw new ArgumentNullException(nameof(value), "PreviousLayer cannot be null.");
         }
     }
-    private ILayer nextLayer = null!;
-    public ILayer NextLayer
+    protected ILayer? nextLayer = null!;
+    public virtual ILayer? NextLayer
     {
         get
         {
@@ -126,7 +126,7 @@ public class Layer : ILayer
         return steps;
     }
 
-    public double GetWeightChainFactor(int inputIndex)
+    public virtual double GetWeightChainFactor(int inputIndex)
     {
         double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
         double otherChainFactor = 0;
@@ -136,7 +136,7 @@ public class Layer : ILayer
         }
         return chainFactor * otherChainFactor;
     }
-    public double GetBiasChainFactor()
+    public virtual double GetBiasChainFactor()
     {
         double chainFactor = NextLayer.GetBiasChainFactor();
         double otherChainFactor = 0;

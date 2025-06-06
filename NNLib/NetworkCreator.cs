@@ -11,28 +11,25 @@ public class NetworkCreator
     public Func<double,double>[] ActivationFunctions { get; set; }
 
     public double[][] Ys { get; set; }
-    public NetworkCreator(int[] layerSizes, Func<double,double>[] activationFunctions)
+    public NetworkCreator(int inputs, int[] layerSizes, Func<double,double>[] activationFunctions)
     {
         Weights = new double[layerSizes.Length][][];
-        Weights[0] = [];  // Input layer has no weights
-        Weights[^1] = []; // Output layer has no weights
         ActivationFunctions = activationFunctions;
-        for (int i = 1; i < layerSizes.Length - 1; i++) // Exclude output layer
+        for (int i = 0; i < layerSizes.Length; i++) 
         {
             Weights[i] = new double[layerSizes[i]][];
             for (int j = 0; j < layerSizes[i]; j++) // Nodes
             {
-                Weights[i][j] = new double[layerSizes[i-1]]; // Size should be previous layer size
-                for (int k = 0; k < layerSizes[i-1]; k++) // Inputs from previous layer
+                inputs = i > 0 ? layerSizes[i - 1] : inputs;
+                Weights[i][j] = new double[inputs]; // Size should be previous layer size
+                for (int k = 0; k < inputs; k++) // Inputs from previous layer
                 {
                     Weights[i][j][k] = 0;
                 }
             }
         }
         Biases = new double[layerSizes.Length][][];
-        Biases[0] = []; // Input layer has no biases
-        Biases[^1] = []; // Output layer has no biases
-        for (int i = 1; i < layerSizes.Length - 1; i++) // Exclude output layer
+        for (int i = 0; i < layerSizes.Length; i++) 
         {
             Biases[i] = new double[layerSizes[i]][];
             for (int j = 0; j < layerSizes[i]; j++) // Nodes
@@ -50,7 +47,7 @@ public class NetworkCreator
 
     public void RandomizeWeights()
     {
-        for (int i = 1; i < Weights.Length-1; i++) // Exclude output layer
+        for (int i = 0; i < Weights.Length; i++) // Exclude output layer
         {
             for (int j = 0; j < Weights[i].Length; j++)
             {

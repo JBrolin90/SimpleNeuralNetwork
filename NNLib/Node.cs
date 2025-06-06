@@ -91,13 +91,16 @@ public class Node : INode
 
     public NodeSteps Backward(double error, NodeSteps nodeSteps)
     {
+        double cf=1;
         for (int i = 0; i < Weights.Length; i++)
         {
-            var s = error * Layer.NextLayer.GetWeightChainFactor(Index) * GetWeightDerivativeX(i);
-            nodeSteps.WeightSteps[i] += error * Layer.NextLayer.GetWeightChainFactor(Index) * GetWeightDerivativeX(i);
+            if (Layer.NextLayer != null)
+            {
+                cf = Layer.NextLayer.GetWeightChainFactor(Index);
+            }
+            nodeSteps.WeightSteps[i] += error * cf * GetWeightDerivativeX(i);
         }
-        var b = error * Layer.NextLayer.GetWeightChainFactor(Index) * BiasDerivative();
-        nodeSteps.BiasStep += error * Layer.NextLayer.GetWeightChainFactor(Index) * BiasDerivative();
+        nodeSteps.BiasStep += error * cf * BiasDerivative();
 
         return nodeSteps;
     }

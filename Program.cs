@@ -1,52 +1,53 @@
 ﻿using BackPropagation.NNLib;
 internal class Program
 {
+    const int epochs = 3000000;
     private static void Main(string[] args)
     {
-        Console.WriteLine("Hello, BackPropagation learners!");
+        // Debug NetworkCreator structure
+        var inputs = 1;
+        var layerSizes = new int[] { 2, 1 };
+        var activationFunctions = new Func<double, double>[] {
+            ActivationFunctions.Unit,
+            ActivationFunctions.SoftPlus,
+            ActivationFunctions.Unit
+        };
 
-        double[] inputs = [0, 0.5, 1];
-        double[] observed = [0, 1, 0];
+        var creator = new NetworkCreator(inputs, layerSizes, activationFunctions);
 
-        double[][][] weights = [
-            [],
-            [[2.74], [-1.13]],
-            [[0.36, 0.63]],
-            []
-            ];
-        double[][][] biases = [[], [[0], [0]], [[0]], []];
-        double[][] ys = [[0], [0, 0], [0], [0]];
+        Console.WriteLine($"Inputs: {inputs}");
+        Console.WriteLine($"Layer sizes: [{string.Join(", ", layerSizes)}]");
+        Console.WriteLine($"Weights structure:");
 
-
-        Func<double, double>[] activationFunctions = [
-            ActivationFunctions.Unit, // Activation function for the second layer
-    ActivationFunctions.SoftPlus, // Activation function for the first layer
-    ActivationFunctions.Unit, // Activation function for the second layer
-    ActivationFunctions.Unit // Activation function for the second layer
-        ];
-
-
-        NeuralNetworkTrainer nn = new(new LayerFactory(), new NodeFactory(),
-             weights, biases, ys, 0.01, activationFunctions);
-        NetworkCreator creator = new NetworkCreator([1, 2, 1, 1], activationFunctions);
-        creator.RandomizeWeights();
-        //creator.Weights = [[], [[2.74], [-1.13]], [[0.36, 0.63]], []];
-        //creator.Biases = [[], [[0], [0]], [[0]], []]; 
-        //creator.Ys = ys;
-        //creator.ActivationFunctions = activationFunctions;
-        for (int i = 0; i < 500; i++)
+        for (int i = 0; i < creator.Weights.Length; i++)
         {
-            nn.Train(inputs, observed);
+            Console.WriteLine($"  Layer {i}: {creator.Weights[i].Length} nodes");
+            for (int j = 0; j < creator.Weights[i].Length; j++)
+            {
+                Console.WriteLine($"    Node {j}: {creator.Weights[i][j].Length} weights");
+            }
         }
-        Console.WriteLine($"SSR: {nn.SSR}");
 
-        NeuralNetworkTrainer nn2 = creator.CreateNetwork();
-        for (int i = 0; i < 500; i++)
+        Console.WriteLine($"\nBiases structure:");
+        for (int i = 0; i < creator.Biases.Length; i++)
         {
-            nn2.Train(inputs, observed);
+            Console.WriteLine($"  Layer {i}: {creator.Biases[i].Length} nodes");
+            for (int j = 0; j < creator.Biases[i].Length; j++)
+            {
+                Console.WriteLine($"    Node {j}: {creator.Biases[i][j].Length} biases");
+            }
         }
-        Console.WriteLine($"SSR2: {nn2.SSR}");
-        Console.WriteLine($"SSR: ");
 
+        Console.WriteLine($"\nTrying to access creator.Weights[1][1][0]...");
+        try
+        {
+            var value = creator.Weights[1][1][0];
+            Console.WriteLine($"Successfully accessed: {value}");
+        }
+        catch (IndexOutOfRangeException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            Console.WriteLine($"Layer 1 has {creator.Weights[1].Length} nodes, but trying to access node 1 (0-based)");
+        }
     }
 }

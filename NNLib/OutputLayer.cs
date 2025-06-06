@@ -2,80 +2,40 @@ using System;
 
 namespace BackPropagation.NNLib;
 
-public class OutputLayer : ILayer
+public class OutputLayer : Layer
 {
-    #region Properties
-    private ILayer? prevLayer = null!;
-    public ILayer PreviousLayer
+
+    public override ILayer? NextLayer
     {
         get
         {
-            if (prevLayer == null)
-            {
-                throw new InvalidOperationException("PreviousLayer is not set. Ensure to set it before accessing.");
-            }
-            return prevLayer;
+            return null;
         }
         set
         {
-            prevLayer = value ?? throw new ArgumentNullException(nameof(value), "PreviousLayer cannot be null.");
+            throw new InvalidOperationException( "The outputlayer cannot have a next layer");
         }
     }
-    private ILayer nextLayer = null!;
-    public ILayer NextLayer
-    {
-        get
-        {
-            if (nextLayer == null)
-            {
-                throw new InvalidOperationException("NextLayer is not set. Ensure to set it before accessing.");
-            }
-            return nextLayer;
-        }
-        set
-        {
-            nextLayer = value ?? throw new ArgumentNullException(nameof(value), "NextLayer cannot be null.");
-        }
-    }
-    public INode[] Nodes { get; set; } = Array.Empty<INode>();
-    public double[] Ys { get; set; }
-    public double[]? Inputs { get; set; }
-    #endregion
+
+
     #region Constructors
-    public OutputLayer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null, int outputSize = 1)
+    public OutputLayer(int index, INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
+    : base(index, NodeFactory, weights, biases, activationFunction)
     {
-        Nodes = new INode[0]; // Output layer has no nodes
-        Ys = new double[outputSize];
     }
     #endregion
 
-    public double[] Forward(double[] inputs)
+    public override double GetWeightChainFactor(int inputIndex)
     {
-        Inputs = inputs;
-        // Since output layer has no weights/biases, we need to transform inputs to outputs
-        // This is a simplified approach - in a real network, the last hidden layer would be the actual output
-        // For now, we'll take the first N inputs where N is the expected output size
-        for (int i = 0; i < Ys.Length && i < inputs.Length; i++)
+        double chainFactor = 1;  
+        double otherChainFactor = 0;
+        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            Ys[i] = inputs[i];
+            otherChainFactor += Nodes[nodeIndex].GetWeightDerivativeW(inputIndex);
         }
-        // If we need more outputs than inputs, replicate the last input
-        for (int i = inputs.Length; i < Ys.Length; i++)
-        {
-            Ys[i] = inputs.Length > 0 ? inputs[inputs.Length - 1] : 0;
-        }
-        return Ys;
+        return chainFactor * otherChainFactor;
     }
-    public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
-    {
-        return steps;
-    }
-
-    public double GetWeightChainFactor(int _)
-    {
-        return 1;
-    }
-    public double GetBiasChainFactor()
+    public override double GetBiasChainFactor()
     {
         return 1;
     }

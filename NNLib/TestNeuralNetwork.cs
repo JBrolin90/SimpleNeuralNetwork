@@ -14,13 +14,17 @@ public class NeuralNetworkTrainer : NeuralNetwork
 {
     public double SSR = 0;
     public double dSSR = 0;
+
+    public double LearningRate = 0;
     public NodeSteps[][] NodeSteps = Array.Empty<NodeSteps[]>();
 
     public NeuralNetworkTrainer(ILayerFactory LayerFactory, INodeFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
-                        : base(LayerFactory, NodeFactory, weights, biases, ys, activationFunctions, learningRate)
-    { }
+                        : base(LayerFactory, NodeFactory, weights, biases, ys, activationFunctions ?? Array.Empty<Func<double, double>>())
+    {
+        LearningRate = learningRate;
+    }
 
     public void Train(double[] inputs, double[] expectedOutputs)
     {
@@ -75,10 +79,10 @@ public class NeuralNetworkTrainer : NeuralNetwork
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
                     double deltaW = NodeSteps[j1][k1].WeightSteps[l];
-                    Weigths[j1][k1][l] -= deltaW * 0.01; //LearningRate;
+                    Weigths[j1][k1][l] -= deltaW * LearningRate;
                 }
                 double deltaB = NodeSteps[j1][k1].BiasStep;
-                Biases[j1][k1][0] -= deltaB * 0.01; //LearningRate;
+                Biases[j1][k1][0] -= deltaB * LearningRate;
             }
         }
     }

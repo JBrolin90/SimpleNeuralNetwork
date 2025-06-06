@@ -17,7 +17,7 @@ public class SimpleNetworkCreatorTest
         ];
 
         // Act
-        var creator = new NetworkCreator(layerSizes, activationFunctions);
+        var creator = new NetworkCreator(2, layerSizes, activationFunctions);
 
         // Assert
         Assert.NotNull(creator);

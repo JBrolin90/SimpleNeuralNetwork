@@ -26,7 +26,7 @@ public class NeuralNetworkTests
         ];
 
         return new NeuralNetwork(new LayerFactory(), new NodeFactory(),
-            weights, biases, ys, activationFunctions, 0.01);
+            weights, biases, ys, activationFunctions);
     }
 
     [Fact]

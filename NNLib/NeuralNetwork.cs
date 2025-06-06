@@ -10,6 +10,7 @@ public interface INeuralNetwork
     public double[][][] Biases { get; set; }
     public Func<double, double>[] ActivationFunctions { get; set; }
     double[] Predict(double[] inputs);
+
 }
 
 public class NeuralNetwork : INeuralNetwork
@@ -23,8 +24,7 @@ public class NeuralNetwork : INeuralNetwork
     #endregion
     #region Constructors
     public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
-                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions,
-                        double learningRate = 0.01)
+                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions)
     {
         if (LayerFactory == null) throw new ArgumentNullException(nameof(LayerFactory), "LayerFactory cannot be null");
         if (NodeFactory == null) throw new ArgumentNullException(nameof(NodeFactory), "NodeFactory cannot be null");
