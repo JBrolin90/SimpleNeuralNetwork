@@ -42,19 +42,27 @@ public class OutputLayer : ILayer
     public double[]? Inputs { get; set; }
     #endregion
     #region Constructors
-    public OutputLayer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
+    public OutputLayer(INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null, int outputSize = 1)
     {
-        Ys = new double[biases.Length];
+        Nodes = new INode[0]; // Output layer has no nodes
+        Ys = new double[outputSize];
     }
     #endregion
 
     public double[] Forward(double[] inputs)
     {
         Inputs = inputs;
-        Ys = new double[inputs.Length];
-        for (int i = 0; i < inputs.Length; i++)
+        // Since output layer has no weights/biases, we need to transform inputs to outputs
+        // This is a simplified approach - in a real network, the last hidden layer would be the actual output
+        // For now, we'll take the first N inputs where N is the expected output size
+        for (int i = 0; i < Ys.Length && i < inputs.Length; i++)
         {
-            Ys[i] = inputs.Sum();  //Nodes[i].ProcessInputs(inputs);
+            Ys[i] = inputs[i];
+        }
+        // If we need more outputs than inputs, replicate the last input
+        for (int i = inputs.Length; i < Ys.Length; i++)
+        {
+            Ys[i] = inputs.Length > 0 ? inputs[inputs.Length - 1] : 0;
         }
         return Ys;
     }

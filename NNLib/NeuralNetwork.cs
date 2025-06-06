@@ -31,12 +31,14 @@ public class NeuralNetwork : INeuralNetwork
         Ys = ys;
         Weigths = weights;
         Biases = biases;
+        ActivationFunctions = activationFunctions;
         Layers = new ILayer[weights.Length];
 
         for (int i = 0; i < Layers.Length; i++)
         {
             var layerType = i == 0 ? LayerType.Input : i == Layers.Length - 1 ? LayerType.Output : LayerType.Hidden;
-            Layers[i] = LayerFactory.Create(i, NodeFactory, weights[i], biases[i], activationFunctions[i], layerType);
+            var expectedOutputs = layerType == LayerType.Output ? ys[i] : null;
+            Layers[i] = LayerFactory.Create(i, NodeFactory, weights[i], biases[i], activationFunctions[i], layerType, expectedOutputs);
             if (i > 0)
             {
                 Layers[i].PreviousLayer = Layers[i - 1];

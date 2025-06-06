@@ -15,7 +15,7 @@ public class TestNeuralNetworkTests
             []
         ];
         double[][][] biases = [[], [[0], [0]], [[0]], []];
-        double[][] ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        double[][] ys = [[0], [0, 0], [0], [0]];
         
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,

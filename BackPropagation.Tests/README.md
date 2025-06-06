@@ -12,6 +12,7 @@ The test suite provides comprehensive coverage for all neural network components
 - **TestNeuralNetworkTests** (`TestNeuralNetworkTests.cs`) - Tests for training functionality and weight updates
 - **LayerTests** (`LayerTests.cs`) - Tests for Layer class forward propagation and connectivity
 - **NodeTests** (`NodeTests.cs`) - Tests for Node class input processing and activation
+- **NetworkCreatorTests** (`NetworkCreatorTests.cs`) - Tests for NetworkCreator class that builds neural networks with various architectures
 
 ### Factory Pattern
 - **FactoryTests** (`FactoryTests.cs`) - Tests for NodeFactory and LayerFactory classes
@@ -164,5 +165,14 @@ The test suite is designed to run quickly:
 - Most tests complete in milliseconds
 - No external dependencies or file I/O
 - Lightweight test data and minimal setup
+
+#### NetworkCreator Test Coverage
+The NetworkCreator tests specifically cover:
+- **Constructor validation** - Proper initialization of weights, biases, and network structure
+- **Weight randomization** - Testing the RandomizeWeights() functionality and value ranges
+- **Network creation** - Validation that CreateNetwork() produces working NeuralNetworkTrainer instances
+- **Property management** - Testing getter/setter functionality for all properties
+- **Architecture flexibility** - Support for various network sizes and configurations
+- **Integration testing** - End-to-end testing of created networks with training capabilities
 
 For performance testing of the neural network itself, see the integration tests which include timing assertions for training operations.

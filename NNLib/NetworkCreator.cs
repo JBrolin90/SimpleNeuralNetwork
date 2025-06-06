@@ -14,45 +14,43 @@ public class NetworkCreator
     public NetworkCreator(int[] layerSizes, Func<double,double>[] activationFunctions)
     {
         Weights = new double[layerSizes.Length][][];
-        Weights[0] = [];  
-        Weights[^1] = []; 
+        Weights[0] = [];  // Input layer has no weights
+        Weights[^1] = []; // Output layer has no weights
         ActivationFunctions = activationFunctions;
-        for (int i = 1; i < layerSizes.Length - 1; i++) //Layers
+        for (int i = 1; i < layerSizes.Length - 1; i++) // Exclude output layer
         {
             Weights[i] = new double[layerSizes[i]][];
             for (int j = 0; j < layerSizes[i]; j++) // Nodes
             {
-                Weights[i][j] = new double[i];
-                if (i > 0)
+                Weights[i][j] = new double[layerSizes[i-1]]; // Size should be previous layer size
+                for (int k = 0; k < layerSizes[i-1]; k++) // Inputs from previous layer
                 {
-                    for (int k = 0; k < layerSizes[i-1]; k++) // Inputs from previous layer
-                    {
-                        Weights[i][j][k] = 0;
-                    }
+                    Weights[i][j][k] = 0;
                 }
             }
         }
         Biases = new double[layerSizes.Length][][];
-        Biases[0] = []; 
-        Biases[^1] = []; 
-        for (int i = 1; i < layerSizes.Length - 1; i++) //Layers
+        Biases[0] = []; // Input layer has no biases
+        Biases[^1] = []; // Output layer has no biases
+        for (int i = 1; i < layerSizes.Length - 1; i++) // Exclude output layer
         {
             Biases[i] = new double[layerSizes[i]][];
             for (int j = 0; j < layerSizes[i]; j++) // Nodes
             {
-                for (int k = 0; k < layerSizes[i]; k++) // Inputs
-                {
-                    Biases[i][j] = [0]; //Allways one bias
-                }
+                Biases[i][j] = [0]; // Each node has one bias
             }
-            Biases[i][0] = [0];
         }
-        Ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        // Initialize Ys based on layer sizes
+        Ys = new double[layerSizes.Length][];
+        for (int i = 0; i < layerSizes.Length; i++)
+        {
+            Ys[i] = new double[layerSizes[i]];
+        }
     }
 
     public void RandomizeWeights()
     {
-        for (int i = 1; i < Weights.Length-1; i++)
+        for (int i = 1; i < Weights.Length-1; i++) // Exclude output layer
         {
             for (int j = 0; j < Weights[i].Length; j++)
             {

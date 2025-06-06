@@ -20,7 +20,7 @@ public class IntegrationTests
             []
         ];
         double[][][] biases = [[], [[0], [0]], [[0]], []];
-        double[][] ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        double[][] ys = [[0], [0, 0], [0], [0]];
 
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
@@ -66,7 +66,7 @@ public class IntegrationTests
             []
         ];
         double[][][] biases = [[], [[0], [0]], [[0]], []];
-        double[][] ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        double[][] ys = [[0], [0, 0], [0], [0]];
 
         Func<double, double>[] activationFunctions = [
             ActivationFunctions.Unit,
@@ -121,7 +121,7 @@ public class IntegrationTests
             []
         ];
         double[][][] biases = [[], [[0], [0]], [[0]], []];
-        double[][] ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
+        double[][] ys = [[0], [0, 0], [0], [0]];
 
         foreach (var activationFunctions in activationSets)
         {

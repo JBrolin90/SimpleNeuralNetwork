@@ -12,12 +12,12 @@ public enum LayerType
 }
 public interface ILayerFactory
 {
-    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden);
+    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]? expectedOutputs = null);
 }
 
 public class LayerFactory : ILayerFactory
 {
-    public ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden)
+    public ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]? expectedOutputs = null)
     {
         if (layerType == LayerType.Input)
         {
@@ -25,7 +25,7 @@ public class LayerFactory : ILayerFactory
         }
         if (layerType == LayerType.Output)
         {
-            return new OutputLayer(factory, weights, biases, activationFunctions);
+            return new OutputLayer(factory, weights, biases, activationFunctions, expectedOutputs?.Length ?? 1);
         }
         return new Layer(index, factory, weights, biases, activationFunctions);
     }
