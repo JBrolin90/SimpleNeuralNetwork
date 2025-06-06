@@ -10,13 +10,13 @@ public class NodeSteps(int weightCount)
     public double BiasStep = 0;
 }
 
-public class TestNeuralNetwork : NeuralNetwork
+public class NeuralNetworkTrainer : NeuralNetwork
 {
     public double SSR = 0;
     public double dSSR = 0;
     public NodeSteps[][] NodeSteps = Array.Empty<NodeSteps[]>();
 
-    public TestNeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
+    public NeuralNetworkTrainer(ILayerFactory LayerFactory, INodeFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
                         : base(LayerFactory, NodeFactory, weights, biases, ys, activationFunctions, learningRate)
@@ -37,6 +37,8 @@ public class TestNeuralNetwork : NeuralNetwork
         UpdateWeightsAndBiases();
 
     }
+
+    
 
     public void PrepareBackPropagation()
     {

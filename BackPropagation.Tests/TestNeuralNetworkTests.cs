@@ -6,7 +6,7 @@ namespace BackPropagation.Tests;
 
 public class TestNeuralNetworkTests
 {
-    private TestNeuralNetwork CreateTestNetwork()
+    private NeuralNetworkTrainer CreateTestNetwork()
     {
         double[][][] weights = [
             [],
@@ -24,7 +24,7 @@ public class TestNeuralNetworkTests
             ActivationFunctions.Unit
         ];
 
-        return new TestNeuralNetwork(new LayerFactory(), new NodeFactory(),
+        return new NeuralNetworkTrainer(new LayerFactory(), new NodeFactory(),
             weights, biases, ys, 0.01, activationFunctions);
     }
 

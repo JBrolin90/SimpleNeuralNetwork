@@ -30,7 +30,7 @@ public class IntegrationTests
         ];
 
         // Act - Create and test the network
-        var testNN = new TestNeuralNetwork(new LayerFactory(), new NodeFactory(),
+        var testNN = new NeuralNetworkTrainer(new LayerFactory(), new NodeFactory(),
             weights, biases, ys, 0.01, activationFunctions);
 
         // Initial prediction
@@ -75,7 +75,7 @@ public class IntegrationTests
             ActivationFunctions.Unit
         ];
 
-        var testNN = new TestNeuralNetwork(new LayerFactory(), new NodeFactory(),
+        var testNN = new NeuralNetworkTrainer(new LayerFactory(), new NodeFactory(),
             weights, biases, ys, 0.01, activationFunctions);
 
         // Act - Train and record SSR values
@@ -126,7 +126,7 @@ public class IntegrationTests
         foreach (var activationFunctions in activationSets)
         {
             // Act
-            var network = new TestNeuralNetwork(new LayerFactory(), new NodeFactory(),
+            var network = new NeuralNetworkTrainer(new LayerFactory(), new NodeFactory(),
                 weights, biases, ys, 0.01, activationFunctions);
 
             var output = network.Predict([0.5]);

@@ -8,6 +8,7 @@ public interface INeuralNetwork
     public double[][] Ys { get; set; }
     public double[][][] Weigths { get; set; }
     public double[][][] Biases { get; set; }
+    public Func<double, double>[] ActivationFunctions { get; set; }
     double[] Predict(double[] inputs);
 }
 
@@ -18,6 +19,7 @@ public class NeuralNetwork : INeuralNetwork
     public double[][] Ys { get; set; }
     public double[][][] Weigths { get; set; }
     public double[][][] Biases { get; set; }
+    public Func<double, double>[] ActivationFunctions { get; set; }
     #endregion
     #region Constructors
     public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
