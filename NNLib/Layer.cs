@@ -108,11 +108,14 @@ public class Layer : ILayer
     public virtual double[] Forward(double[] inputs)
     {
         Inputs = inputs;
+        double[] outputs = new double[Nodes.Length];
+        Ys = new double[Nodes.Length];
         for (int i = 0; i < Nodes.Length; i++)
         {
-            Ys[i] = Nodes[i].ProcessInputs(inputs);
+            outputs[i] = Nodes[i].ProcessInputs(Inputs);
+            Ys[i] = outputs[i];
         }
-        return Ys;
+        return outputs;
     }
     #endregion
     #region Backward

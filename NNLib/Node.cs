@@ -12,10 +12,6 @@ public class NodeFactory : INodeFactory
 {
     public INode Create(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
-        if (layer == null)
-        {
-            throw new ArgumentNullException(nameof(layer), "Layer cannot be null");
-        }
         return new Node(layer, index, weights, bias, activationFunction);
     }
 }
@@ -53,11 +49,12 @@ public class Node : INode
     #region Constructors
     public Node(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
-        Layer = layer;
+        Layer = layer ?? throw new ArgumentNullException(nameof(layer));
         Index = index;
         Weights = weights;
         Bias = bias; // store bias by reference using array
         WeightDerivatives = new double[weights.Length];
+        Xs = new double[weights.Length]; // Initialize Xs array to match weights length
         ActivationFunction = activationFunction ?? ActivationFunctions.SoftPlus;
         if (ActivationFunction == ActivationFunctions.SoftPlus)
         {
@@ -83,7 +80,7 @@ public class Node : INode
             Sum += xs[i] * Weights[i];
         }
         Sum += Bias[0];
-        Y = (ActivationFunction ?? ActivationFunctions.Unit)(Sum);
+        Y = ActivationFunction(Sum);
         return Y;
     }
     #endregion
@@ -91,13 +88,11 @@ public class Node : INode
 
     public NodeSteps Backward(double error, NodeSteps nodeSteps)
     {
-        double cf=1;
+        double cf = 1;
+        cf = Layer.NextLayer!.GetWeightChainFactor(Index);
+        
         for (int i = 0; i < Weights.Length; i++)
         {
-            if (Layer.NextLayer != null)
-            {
-                cf = Layer.NextLayer.GetWeightChainFactor(Index);
-            }
             nodeSteps.WeightSteps[i] += error * cf * GetWeightDerivativeX(i);
         }
         nodeSteps.BiasStep += error * cf * BiasDerivative();

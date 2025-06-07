@@ -21,25 +21,35 @@ public class NeuralNetworkTrainer : NeuralNetwork
     public NeuralNetworkTrainer(ILayerFactory LayerFactory, INodeFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
-                        : base(LayerFactory, NodeFactory, weights, biases, ys, activationFunctions ?? Array.Empty<Func<double, double>>())
+                        : base(LayerFactory, NodeFactory, weights, biases, ys, 
+                              activationFunctions ?? CreateDefaultActivationFunctions(weights.Length))
     {
         LearningRate = learningRate;
     }
 
+    private static Func<double, double>[] CreateDefaultActivationFunctions(int layerCount)
+    {
+        var functions = new Func<double, double>[layerCount];
+        for (int i = 0; i < layerCount; i++)
+        {
+            functions[i] = BackPropagation.NNLib.ActivationFunctions.Unit;
+        }
+        return functions;
+    }
+
     public void Train(double[] inputs, double[] expectedOutputs)
     {
-        double[][] predictions = new double[inputs.Length][];
+        // inputs is a single sample with multiple features
+        // expectedOutputs is the expected output for this single sample
         SSR = 0; dSSR = 0;
         PrepareBackPropagation();
-        for (int i = 0; i < inputs.Length; i++)
-        {
-            predictions[i] = Predict([inputs[i]]);
-            SSR += Math.Pow(expectedOutputs[i] - predictions[i][0], 2);
-            dSSR = -2 * (expectedOutputs[i] - predictions[i][0]);
-            BackPropagate(dSSR);
-        }
+        
+        var prediction = Predict(inputs);
+        SSR += Math.Pow(expectedOutputs[0] - prediction[0], 2);
+        dSSR = -2 * (expectedOutputs[0] - prediction[0]);
+        BackPropagate(dSSR);
+        
         UpdateWeightsAndBiases();
-
     }
 
     
