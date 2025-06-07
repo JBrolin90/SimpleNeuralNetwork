@@ -47,7 +47,7 @@ public class Node : INode
     public Func<double, double> ActivationDerivative { get; set; } = ActivationFunctions.SoftPlusDerivative;
     #endregion
     #region Constructors
-    public Node(Layer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
+    public Node(ILayer layer, int index, double[] weights, double[] bias, Func<double, double>? activationFunction = null)
     {
         Layer = layer ?? throw new ArgumentNullException(nameof(layer));
         Index = index;

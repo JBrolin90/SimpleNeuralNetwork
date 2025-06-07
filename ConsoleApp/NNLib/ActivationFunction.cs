@@ -40,4 +40,14 @@ public static class ActivationFunctions
     {
         return x < 0 ? 0 : 1;
     }
+
+    public static double LeakyReLU(double x, double alpha = 0.01)
+    {
+        return x > 0 ? x : alpha * x;
+    }
+
+    public static double LeakyReLUDerivative(double x, double alpha = 0.01)
+    {
+        return x > 0 ? 1 : alpha;
+    }
 }

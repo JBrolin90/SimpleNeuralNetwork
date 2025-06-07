@@ -56,36 +56,29 @@ public class Layer : ILayer
     public double[][] Biases { get; set; }
     public double[] Ys { get; set; }
     Func<double, double>? ActivationFunction { get; set; }
-    protected ILayer? prevLayer = null!;
-    public virtual ILayer? PreviousLayer
-    {
-        get
-        {
-            if (prevLayer == null)
-            {
-                throw new InvalidOperationException("PreviousLayer is not set. Ensure to set it before accessing.");
-            }
-            return prevLayer;
-        }
-        set
-        {
-            prevLayer = value ?? throw new ArgumentNullException(nameof(value), "PreviousLayer cannot be null.");
-        }
-    }
-    protected ILayer? nextLayer = null!;
+    protected ILayer? nextLayer = null;
     public virtual ILayer? NextLayer
     {
         get
         {
-            if (nextLayer == null)
-            {
-                throw new InvalidOperationException("NextLayer is not set. Ensure to set it before accessing.");
-            }
             return nextLayer;
         }
         set
         {
-            nextLayer = value ?? throw new ArgumentNullException(nameof(value), "NextLayer cannot be null.");
+            nextLayer = value;
+        }
+    }
+    
+    protected ILayer? prevLayer = null;
+    public virtual ILayer? PreviousLayer
+    {
+        get
+        {
+            return prevLayer;
+        }
+        set
+        {
+            prevLayer = value;
         }
     }
     #endregion
@@ -131,7 +124,12 @@ public class Layer : ILayer
 
     public virtual double GetWeightChainFactor(int inputIndex)
     {
-        double chainFactor = NextLayer!.GetWeightChainFactor(inputIndex);
+        if (NextLayer == null)
+        {
+            return 1.0; // Terminal layer, no chain factor multiplication needed
+        }
+        
+        double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
         double otherChainFactor = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
@@ -139,9 +137,15 @@ public class Layer : ILayer
         }
         return chainFactor * otherChainFactor;
     }
+    
     public virtual double GetBiasChainFactor()
     {
-        double chainFactor = NextLayer!.GetBiasChainFactor();
+        if (NextLayer == null)
+        {
+            return 1.0; // Terminal layer, no chain factor multiplication needed
+        }
+        
+        double chainFactor = NextLayer.GetBiasChainFactor();
         double otherChainFactor = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
