@@ -35,6 +35,8 @@ public class OutputLayer : Layer
         }
         return chainFactor * otherChainFactor;
     }
+
+
     public override double GetBiasChainFactor()
     {
         return 1;

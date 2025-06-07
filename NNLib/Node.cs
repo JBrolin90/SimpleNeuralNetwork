@@ -86,16 +86,23 @@ public class Node : INode
     #endregion
     #region Backpropagation
 
-    public NodeSteps Backward(double error, NodeSteps nodeSteps)
+    public virtual NodeSteps Backward(double error, NodeSteps nodeSteps)
     {
         double cf = 1;
-        cf = Layer.NextLayer!.GetWeightChainFactor(Index);
-        
+        if (Layer.NextLayer != null)
+        {
+            cf = Layer.NextLayer!.GetWeightChainFactor(Index);
+        }
+
         for (int i = 0; i < Weights.Length; i++)
         {
-            nodeSteps.WeightSteps[i] += error * cf * GetWeightDerivativeX(i);
+            double wd = GetWeightDerivativeX(i);
+            double wStep = error * cf * wd;
+            nodeSteps.WeightSteps[i] += wStep;
         }
-        nodeSteps.BiasStep += error * cf * BiasDerivative();
+        double bd = BiasDerivative();
+        double bStep = error * cf * bd;
+        nodeSteps.BiasStep += bStep;
 
         return nodeSteps;
     }

@@ -2,9 +2,9 @@
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, BackPropagation learners!");
 
-const int epochs = 200000;
-double[] inputs = [0, 0.5, 1];
-double[] observed = [0, 1, 0];
+const int epochs = 5000;
+double[][] samples = [[0], [0.5], [1]];
+double[][] observed = [[0], [1], [0]];
 
 double[][][] weights = [
     [[2.74], [-1.13]],
@@ -45,9 +45,9 @@ Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]} Sum = {out
 
 for (int i = 0; i < epochs; i++)
 {
-    nn1.Train(inputs, observed);
+    nn1.Train(samples, observed);
 }
-Console.WriteLine($"SSR nn1: {nn1.SSR}");
+Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
 
 NetworkCreator creator = new(1, [2, 1], activationFunctions);
 creator.RandomizeWeights();
@@ -55,7 +55,7 @@ NeuralNetworkTrainer nn2 = creator.CreateNetwork();
 
 for (int i = 0; i < epochs; i++)
 {
-    nn2.Train(inputs, observed);
+    nn2.Train(samples, observed);
 }
-Console.WriteLine($"SSR nn2: {nn2.SSR}");
+Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
 

@@ -120,7 +120,7 @@ public class Layer : ILayer
     #endregion
     #region Backward
 
-    public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
+    public virtual NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
     {
         for (int i = 0; i < Nodes.Length; i++)
         {
@@ -131,7 +131,7 @@ public class Layer : ILayer
 
     public virtual double GetWeightChainFactor(int inputIndex)
     {
-        double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
+        double chainFactor = NextLayer!.GetWeightChainFactor(inputIndex);
         double otherChainFactor = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
@@ -141,7 +141,7 @@ public class Layer : ILayer
     }
     public virtual double GetBiasChainFactor()
     {
-        double chainFactor = NextLayer.GetBiasChainFactor();
+        double chainFactor = NextLayer!.GetBiasChainFactor();
         double otherChainFactor = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {

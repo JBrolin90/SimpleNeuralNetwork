@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using System.Globalization;
 using System.Net.WebSockets;
 
 namespace BackPropagation.NNLib;
@@ -12,8 +13,8 @@ public class NodeSteps(int weightCount)
 
 public class NeuralNetworkTrainer : NeuralNetwork
 {
-    public double SSR = 0;
-    public double dSSR = 0;
+    public double[] SSR = [];
+    public double[] dSSR = [];
 
     public double LearningRate = 0;
     public NodeSteps[][] NodeSteps = Array.Empty<NodeSteps[]>();
@@ -37,18 +38,26 @@ public class NeuralNetworkTrainer : NeuralNetwork
         return functions;
     }
 
-    public void Train(double[] inputs, double[] expectedOutputs)
+    public void Train(double[][] trainingData, double[][] expectedOutputs)
     {
-        // inputs is a single sample with multiple features
-        // expectedOutputs is the expected output for this single sample
-        SSR = 0; dSSR = 0;
+        double[][] predictions = new double[trainingData.Length][];
+        int outputCount = Layers[^1].Nodes.Length;
+        SSR = new double[outputCount];
+        dSSR = new double[outputCount];
         PrepareBackPropagation();
-        
-        var prediction = Predict(inputs);
-        SSR += Math.Pow(expectedOutputs[0] - prediction[0], 2);
-        dSSR = -2 * (expectedOutputs[0] - prediction[0]);
-        BackPropagate(dSSR);
-        
+        for (int i = 0; i < trainingData.Length; i++)
+        {
+            predictions[i] = Predict(trainingData[i]);
+            for (int j = 0; j < outputCount; j++)
+            {
+                SSR[j] = Math.Pow(expectedOutputs[i][j] - predictions[i][j], 2);
+                dSSR[j] = -2 * (expectedOutputs[i][j] - predictions[i][j]);
+            }
+
+            BackPropagate(dSSR);
+        }
+
+
         UpdateWeightsAndBiases();
     }
 
@@ -69,12 +78,12 @@ public class NeuralNetworkTrainer : NeuralNetwork
         }
     }
 
-    public void BackPropagate(double dSSR)
+    public void BackPropagate(double[] dSSR)
     {
         int i = 0;
         foreach (var layer in Layers)
         {
-            layer.Backward(dSSR, NodeSteps[i]);
+            layer.Backward(dSSR[0], NodeSteps[i]);
             i++;
         }
     }
