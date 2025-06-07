@@ -12,7 +12,7 @@ public class InputLayer : Layer
         }
         set
         {
-            throw new InvalidOperationException("Inout layer cannot have a previous layer");
+            throw new InvalidOperationException("Input layer cannot have a previous layer");
         }
     }
 
