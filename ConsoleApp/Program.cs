@@ -3,6 +3,7 @@ using BackPropagation.NNLib;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, BackPropagation learners!");
 
+// Test original SimpleAdder implementation
 const int epochs = 5000;
 double[][] samples = [[0], [0.5], [1]];
 double[][] observed = [[0], [1], [0]];
@@ -61,3 +62,6 @@ Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]} Sum = {out
 // Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
 
 new Algebra().DoIt();
+
+Console.WriteLine("\n" + new string('=', 50));
+new AlgebraTest().DoIt();
