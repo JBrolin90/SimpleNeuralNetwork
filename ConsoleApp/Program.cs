@@ -1,4 +1,5 @@
-﻿using BackPropagation.NNLib;
+﻿using BackPropagation;
+using BackPropagation.NNLib;
 // See https://aka.ms/new-console-template for more information
 Console.WriteLine("Hello, BackPropagation learners!");
 
@@ -43,19 +44,20 @@ Console.WriteLine($"Outputs: {output0[0]}, {output1[0]}, {output2[0]} Sum = {out
 
 
 
-for (int i = 0; i < epochs; i++)
-{
-    nn1.Train(samples, observed);
-}
-Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
+// for (int i = 0; i < epochs; i++)
+// {
+//     nn1.Train(samples, observed);
+// }
+// Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
 
-NetworkCreator creator = new(1, [2, 1], activationFunctions);
-creator.RandomizeWeights();
-NeuralNetworkTrainer nn2 = creator.CreateNetwork();
+// NetworkCreator creator = new(1, [2, 1], activationFunctions);
+// creator.RandomizeWeights();
+// NeuralNetworkTrainer nn2 = creator.CreateNetwork();
 
-for (int i = 0; i < epochs; i++)
-{
-    nn2.Train(samples, observed);
-}
-Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
+// for (int i = 0; i < epochs; i++)
+// {
+//     nn2.Train(samples, observed);
+// }
+// Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
 
+new Algebra().DoIt();
