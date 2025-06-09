@@ -25,15 +25,17 @@ public class OutputLayer : Layer
     }
     #endregion
 
-    public override double GetWeightChainFactor(int inputIndex)
+    public override double CalculateLayerErrorRecursively(int inputIndex)
     {
-        double chainFactor = 1;  
-        double otherChainFactor = 0;
+        double thisNodeTotalError = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            otherChainFactor += Nodes[nodeIndex].GetWeightDerivativeW(inputIndex);
+            var node = Nodes[nodeIndex];
+            var weight = node.Weights[inputIndex];
+            var activationDerivative = node.ActivationDerivative(node.Sum);
+            thisNodeTotalError +=  activationDerivative * weight;
         }
-        return chainFactor * otherChainFactor;
+        return thisNodeTotalError;
     }
 
 

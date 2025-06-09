@@ -1,4 +1,5 @@
-using System;
+ using System;
+using System.Runtime.CompilerServices;
 
 namespace BackPropagation.NNLib;
 
@@ -28,7 +29,7 @@ public interface INode
     double ProcessInputs(double[] inputs);
     NodeSteps Backward(double error, NodeSteps steps);
     double GetWeightDerivativeW(int index);
-
+    public double GetWeightDerivativeX(int index);
     double BiasDerivative();
 }
 
@@ -88,33 +89,34 @@ public class Node : INode
 
     public virtual NodeSteps Backward(double error, NodeSteps nodeSteps)
     {
-        double cf = 1;
+        double nextLayerError = 1;
         if (Layer.NextLayer != null)
         {
-            cf = Layer.NextLayer!.GetWeightChainFactor(Index);
+            nextLayerError = Layer.NextLayer!.CalculateLayerErrorRecursively(Index);
         }
 
-        for (int i = 0; i < Weights.Length; i++)
+        double activationDerivative = ActivationDerivative(Sum);
+        double gradient = error * nextLayerError * activationDerivative;
+        for (int weightIndex = 0; weightIndex < Weights.Length; weightIndex++)
         {
-            double wd = GetWeightDerivativeX(i);
-            double wStep = error * cf * wd;
-            nodeSteps.WeightSteps[i] += wStep;
+            double input = Xs[weightIndex];
+            nodeSteps.WeightSteps[weightIndex] += gradient * input;
+//            Console.Write($"x={Xs[weightIndex]} Layer: {Layer.Index} Node: {Index} Weight: {weightIndex} WeightStep {gradient * input} " );
         }
-        double bd = BiasDerivative();
-        double bStep = error * cf * bd;
-        nodeSteps.BiasStep += bStep;
-
+        double biasGradient = gradient;
+        nodeSteps.BiasStep += biasGradient;
+//        Console.WriteLine($"Bias {biasGradient}");
         return nodeSteps;
     }
 
 
     public double GetWeightDerivativeX(int index)
     {
-        return Xs[index] * ActivationDerivative(Sum);
+        return Weights[index] * ActivationDerivative(Sum);
     }
     public double GetWeightDerivativeW(int index)
     {
-        return Weights[index] * ActivationDerivative(Sum);
+        return Xs[index] * ActivationDerivative(Sum);
     }
 
     public double BiasDerivative()

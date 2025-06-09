@@ -159,7 +159,7 @@ namespace SimpleNeuralNetwork.Tests
             var inputLayer = new InputLayer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
 
             // Act
-            double chainFactor = inputLayer.GetWeightChainFactor(0);
+            double chainFactor = inputLayer.CalculateLayerErrorRecursively(0);
 
             // Assert
             Assert.Equal(1.0, chainFactor, 7); // Should return 1.0 for terminal layer

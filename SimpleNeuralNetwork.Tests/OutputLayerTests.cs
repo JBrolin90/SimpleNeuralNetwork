@@ -87,7 +87,7 @@ namespace SimpleNeuralNetwork.Tests
             var outputLayer = new OutputLayer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
 
             // Act
-            double chainFactor = outputLayer.GetWeightChainFactor(0);
+            double chainFactor = outputLayer.CalculateLayerErrorRecursively(0);
 
             // Assert
             Assert.Equal(1.0, chainFactor, 7); // Output layer should return 1.0

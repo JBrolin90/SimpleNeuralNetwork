@@ -162,7 +162,7 @@ namespace SimpleNeuralNetwork.Tests
             // No NextLayer set (null)
 
             // Act
-            double result = layer.GetWeightChainFactor(0);
+            double result = layer.CalculateLayerErrorRecursively(0);
 
             // Assert
             Assert.Equal(1.0, result, 7);
