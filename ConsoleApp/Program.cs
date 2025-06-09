@@ -5,4 +5,5 @@ Console.WriteLine("Hello, BackPropagation learners!");
 
 
 //new StatQuestPart2();
-new StatQuestPart2Random();
+//new StatQuestPart2Random();
+new AlgebraTest().DoIt();

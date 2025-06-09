@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using BackPropagation.NNLib;
 
 namespace BackPropagation;
@@ -26,7 +27,9 @@ public class AlgebraTest
 
     public void CreateNetwork()
     {
-        var networkCreator = new NetworkCreator(2, [4, 1], [ActivationFunctions.Unit, ActivationFunctions.Unit]);
+        Func<double, double>[] af = [ActivationFunctions.Unit, ActivationFunctions.Unit];
+ //       Func<double, double>[] af = [ActivationFunctions.SoftPlus, ActivationFunctions.SoftPlus, ActivationFunctions.SoftPlus, ActivationFunctions.SoftPlus];
+        var networkCreator = new NetworkCreator(2, [4, 1], af);
         
         // Initialize weights with random values
         networkCreator.RandomizeWeights();
@@ -40,7 +43,7 @@ public class AlgebraTest
             networkCreator.Weights, 
             networkCreator.Biases, 
             networkCreator.Ys, 
-            0.001,  // Learning rate
+            0.01,  // Learning rate
             networkCreator.ActivationFunctions);
     }
 
@@ -49,12 +52,12 @@ public class AlgebraTest
         for (int epoch = 0; epoch < epochs; epoch++)
         {
             // Train on all samples for this epoch
-            network!.Train(samples, observed);
+            double[] SSR = network!.Train(samples, observed);
             
             if (epoch % 1000 == 0)
             {
                 double[] testResult = network.Predict([0.1, 0.1]);
-                Console.WriteLine($"Epoch {epoch}: Test(0.1+0.1) = {testResult[0]:F6}");
+                Console.WriteLine($"Epoch {epoch}: Test(0.1+0.1) = {testResult[0]:F6}  SSR={SSR[0]}");
             }
         }
     }

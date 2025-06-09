@@ -38,20 +38,20 @@ public class NeuralNetworkTrainer : NeuralNetwork
         return functions;
     }
 
-    public void Train(double[][] trainingData, double[][] expectedOutputs)
+    public double[] Train(double[][] trainingData, double[][] expectedOutputs)
     {
         int outputCount = Layers[^1].Nodes.Length;
         SSR = new double[outputCount];
         dSSR = new double[outputCount];
-        
+
         for (int i = 0; i < trainingData.Length; i++)
         {
             PrepareBackPropagation();
             ResetGradients();
-            
+
             // Forward pass
             double[] predictions = Predict(trainingData[i]);
-            
+
             // Calculate error for this sample
             for (int j = 0; j < outputCount; j++)
             {
@@ -61,13 +61,15 @@ public class NeuralNetworkTrainer : NeuralNetwork
 
             // Backward pass
             BackPropagate(dSSR);
-            
+            //BackPropagateRecursive(dSSR);
+
             // Update weights after each sample (stochastic gradient descent)
             UpdateWeightsAndBiases();
         }
+        return SSR;
     }
 
-    
+
 
     public void PrepareBackPropagation()
     {
@@ -98,6 +100,19 @@ public class NeuralNetworkTrainer : NeuralNetwork
             }
         }
     }
+
+
+    public void BackPropagateRecursive(double[] dSSR)
+    {
+        int i = 0;
+        foreach (var layer in Layers)
+        {
+            layer.Backward(dSSR[0], NodeSteps[i]);
+            i++;
+        }
+    }
+
+
 
     // Store node errors for each layer during backpropagation
     private double[][] nodeErrors = Array.Empty<double[]>();
