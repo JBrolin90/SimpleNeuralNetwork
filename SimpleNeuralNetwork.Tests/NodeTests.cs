@@ -247,7 +247,7 @@ namespace SimpleNeuralNetwork.Tests
             return steps;
         }
 
-        public double GetWeightChainFactor(int index)
+        public double CalculateLayerErrorRecursively(int index)
         {
             return 1.0; // Simplified for testing
         }

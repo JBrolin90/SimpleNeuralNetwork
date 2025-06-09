@@ -34,13 +34,14 @@ public class LayerFactory : ILayerFactory
 #region interfaces
 public interface ILayer
 {
+    public int Index { get; set; }
     public INode[] Nodes { get; set; }
     public ILayer? PreviousLayer { get; set; }
     public ILayer? NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
     NodeSteps[] Backward(double dSSR, NodeSteps[] steps);
-    double GetWeightChainFactor(int index);
+    double CalculateLayerErrorRecursively(int index);
     double GetBiasChainFactor();
 }
 #endregion
@@ -113,29 +114,33 @@ public class Layer : ILayer
     #endregion
     #region Backward
 
-    public virtual NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
+    public virtual NodeSteps[] Backward(double dSSR, NodeSteps[] nodeSteps)
     {
-        for (int i = 0; i < Nodes.Length; i++)
+        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            steps[i] = Nodes[i].Backward(dSSR, steps[i]);
+            nodeSteps[nodeIndex] = Nodes[nodeIndex].Backward(dSSR, nodeSteps[nodeIndex]);
         }
-        return steps;
+        return nodeSteps;
     }
 
-    public virtual double GetWeightChainFactor(int inputIndex)
+    //Calculate Layer Error Recursively
+    public virtual double CalculateLayerErrorRecursively(int inputIndex)
     {
         if (NextLayer == null)
         {
             return 1.0; // Terminal layer, no chain factor multiplication needed
         }
-        
-        double chainFactor = NextLayer.GetWeightChainFactor(inputIndex);
-        double otherChainFactor = 0;
+
+        double nextLayerError = NextLayer.CalculateLayerErrorRecursively(inputIndex);
+        double thisNodeTotalError = 0;
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
-            otherChainFactor += Nodes[nodeIndex].GetWeightDerivativeW(inputIndex);
+            var node = Nodes[nodeIndex];
+            var weight = node.Weights[inputIndex];
+            var activationDerivative = node.ActivationDerivative(node.Sum);
+            thisNodeTotalError += nextLayerError * activationDerivative * weight;
         }
-        return chainFactor * otherChainFactor;
+        return thisNodeTotalError;
     }
     
     public virtual double GetBiasChainFactor()
