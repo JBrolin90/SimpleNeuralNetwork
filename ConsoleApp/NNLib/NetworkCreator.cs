@@ -45,7 +45,7 @@ public class NetworkCreator
         }
     }
 
-    public void RandomizeWeights()
+    public void RandomizeWeights(double from, double to)
     {
         for (int i = 0; i < Weights.Length; i++) // Exclude output layer
         {
@@ -53,7 +53,7 @@ public class NetworkCreator
             {
                 for (int k = 0; k < Weights[i][j].Length; k++)
                 {
-                    Weights[i][j][k] = new Random().NextDouble()*10-5;
+                    Weights[i][j][k] = new Random().NextDouble()*(to-from)-(to-from)/2;
                 }
             }
         }

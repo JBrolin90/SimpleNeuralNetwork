@@ -19,7 +19,7 @@ public class StatQuestPart2Random
     public StatQuestPart2Random()
     {
         NetworkCreator creator = new(1, [2, 1], activationFunctions);
-        creator.RandomizeWeights();
+        creator.RandomizeWeights(-0.3, 0.3);
         NeuralNetworkTrainer nn2 = creator.CreateNetwork();
 
         for (int i = 0; i < epochs; i++)
