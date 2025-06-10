@@ -201,7 +201,7 @@ public class AlgebraTest
         var networkCreator = new NetworkCreator(3, [8, 6, 1], af);
 
         // Initialize weights with random values
-        networkCreator.RandomizeWeights(-0.5, 0.5);
+        networkCreator.RandomizeWeights(-0.2, 0.2);
 
         var layerFactory = new LayerFactory();
         var nodeFactory = new NodeFactory();
