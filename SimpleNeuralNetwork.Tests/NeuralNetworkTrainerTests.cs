@@ -115,7 +115,7 @@ namespace SimpleNeuralNetwork.Tests
             double[][] expectedOutputs = { new double[] { 3.0 } };
 
             // Act
-            trainer.Train(trainingData, expectedOutputs);
+            trainer.TrainOneEpoch(trainingData, expectedOutputs);
 
             // Assert
             Assert.Single(trainer.SSR);
@@ -152,7 +152,7 @@ namespace SimpleNeuralNetwork.Tests
             double[][] expectedOutputs = { new double[] { 3.0 } };
 
             // Act
-            trainer.Train(trainingData, expectedOutputs);
+            trainer.TrainOneEpoch(trainingData, expectedOutputs);
 
             // Assert
             Assert.NotEqual(originalWeight, trainer.Weigths[0][0][0]);
@@ -181,7 +181,7 @@ namespace SimpleNeuralNetwork.Tests
             double[][] expectedOutputs = { new double[] { 3.0 } };
 
             // Act
-            trainer.Train(trainingData, expectedOutputs);
+            trainer.TrainOneEpoch(trainingData, expectedOutputs);
 
             // Assert
             Assert.NotEqual(originalBias, trainer.Biases[0][0][0]);
@@ -211,7 +211,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] dSSR = { 0.1 };
 
             // Act & Assert - Should not throw exception
-            trainer.BackPropagate(dSSR);
+            trainer.PropagateBackwards(dSSR);
         }
 
         [Theory]
@@ -238,7 +238,7 @@ namespace SimpleNeuralNetwork.Tests
             double[][] expectedOutputs = { new double[] { 2.0 } };
 
             // Act
-            trainer.Train(trainingData, expectedOutputs);
+            trainer.TrainOneEpoch(trainingData, expectedOutputs);
 
             // Assert
             Assert.True(trainer.LearningRate == learningRate);
@@ -274,7 +274,7 @@ namespace SimpleNeuralNetwork.Tests
             };
 
             // Act
-            trainer.Train(trainingData, expectedOutputs);
+            trainer.TrainOneEpoch(trainingData, expectedOutputs);
 
             // Assert
             Assert.Single(trainer.SSR);

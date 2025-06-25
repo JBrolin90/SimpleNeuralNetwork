@@ -59,11 +59,11 @@ public class NetworkCreator
         }
     }
 
-    public NeuralNetworkTrainer CreateNetwork()
+    public NeuralNetworkTrainer CreateNetwork(double trainingRate = 0.001)
     {
         NeuralNetworkTrainer n = new(new LayerFactory(), new NodeFactory(),
                         Weights, Biases, Ys,
-                        0.01, ActivationFunctions);
+                        trainingRate, ActivationFunctions);
         return n;
     }
 }

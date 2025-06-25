@@ -24,9 +24,9 @@ public class StatQuestPart2Random
 
         for (int i = 0; i < epochs; i++)
         {
-            nn2.Train(samples, observed);
+            nn2.TrainOneEpoch(samples, observed);
         }
-        Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
+        //        Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
     }
 
 }

@@ -18,8 +18,8 @@ public class StatQuestPart2
     double[][] ys = [[0, 0], [0, 0], [0, 0], [0, 0]];
 
     Func<double, double>[] activationFunctions = [
-        ActivationFunctions.SoftPlus, 
-        ActivationFunctions.Unit 
+        ActivationFunctions.SoftPlus,
+        ActivationFunctions.Unit
     ];
 
     public StatQuestPart2()
@@ -36,9 +36,9 @@ public class StatQuestPart2
 
         for (int i = 0; i < epochs; i++)
         {
-            nn1.Train(samples, observed);
+            nn1.TrainOneEpoch(samples, observed);
         }
-        Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
+        //        Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
     }
 
 }
