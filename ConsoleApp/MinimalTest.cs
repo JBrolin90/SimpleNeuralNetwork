@@ -18,7 +18,7 @@ public class MinimalTest
 
     public void CreateNetwork()
     {
-        Func<double, double>[] af = [ActivationFunctions.ReLU, ActivationFunctions.Unit];
+        Func<double, double>[] af = [ActivationFunctions.SoftPlus, ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(1, [2, 1], af);
         network = networkCreator.CreateNetwork(0.01);
     }
@@ -28,17 +28,13 @@ public class MinimalTest
         for (int i = 0; i < epochs; i++)
         {
             double[] loss = network!.TrainOneEpoch(samples, [[1], [0], [1]]);
-            Console.WriteLine($"Loss = {loss[0]}");
+            Console.WriteLine($"Loss = {loss[0]}\n");
         }
     }
 
-    public void DoIt()
+
+    private double[][][] FixedWeights()
     {
-        CreateNetwork();
-
-        Console.WriteLine("Before training:");
-
-        CreateTrainingData();
         double[][][] Weights = network!.Weigths;
         for (int i = 0; i < Weights.Length; i++)
         {
@@ -52,6 +48,26 @@ public class MinimalTest
                 }
             }
         }
+        return Weights;
+    }
+    public void DoIt()
+    {
+        CreateNetwork();
+
+        Console.WriteLine("Before training:");
+
+        CreateTrainingData();
+
+        double[][][] Weights = network!.Weigths;
+        Weights = [
+            [[2.74], [-1.13]],
+            [[0.36, 0.63]],
+            []
+            ];
+        double[][][] biases = network.Biases = [[[0], [0]], [[0]]];
+
+
+
 
         Train();
 

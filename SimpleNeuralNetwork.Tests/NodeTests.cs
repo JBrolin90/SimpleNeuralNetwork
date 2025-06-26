@@ -236,6 +236,7 @@ namespace SimpleNeuralNetwork.Tests
         public ILayer? PreviousLayer { get; set; }
         public ILayer? NextLayer { get; set; }
         public double[]? Inputs { get; set; }
+        public int Index { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public double[] Forward(double[] inputs)
         {
