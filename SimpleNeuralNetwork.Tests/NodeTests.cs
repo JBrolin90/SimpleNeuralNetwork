@@ -196,16 +196,16 @@ namespace SimpleNeuralNetwork.Tests
             var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
             node.ProcessInputs(inputs);
             
-            var nodeSteps = new NodeSteps(2);
+            var nodeSteps = new Gradients(2);
             double error = 0.1;
             
             // Act
             var result = node.Backward(error, nodeSteps);
             
             // Assert
-            Assert.Equal(0.2, result.WeightSteps[0], 7); // error * chainFactor * weightDerivative[0]
-            Assert.Equal(0.3, result.WeightSteps[1], 7); // error * chainFactor * weightDerivative[1]
-            Assert.Equal(0.1, result.BiasStep, 7); // error * chainFactor * biasDerivative
+            Assert.Equal(0.2, result.WeightGradient[0], 7); // error * chainFactor * weightDerivative[0]
+            Assert.Equal(0.3, result.WeightGradient[1], 7); // error * chainFactor * weightDerivative[1]
+            Assert.Equal(0.1, result.BiasGradient, 7); // error * chainFactor * biasDerivative
         }
 
         [Theory]
@@ -243,7 +243,7 @@ namespace SimpleNeuralNetwork.Tests
             return inputs;
         }
 
-        public NodeSteps[] Backward(double dSSR, NodeSteps[] steps)
+        public Gradients[] Backward(double dSSR, Gradients[] steps)
         {
             return steps;
         }

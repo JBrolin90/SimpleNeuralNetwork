@@ -27,7 +27,7 @@ public interface INode
     Func<double, double> ActivationFunction { get; set; }
     Func<double, double> ActivationDerivative { get; set; }
     double ProcessInputs(double[] inputs);
-    NodeSteps Backward(double error, NodeSteps steps);
+    Gradients Backward(double error, Gradients steps);
     double GetWeightDerivativeW(int index);
     public double GetWeightDerivativeX(int index);
     double BiasDerivative();
@@ -87,7 +87,7 @@ public class Node : INode
     #endregion
     #region Backpropagation
 
-    public virtual NodeSteps Backward(double error, NodeSteps nodeSteps)
+    public virtual Gradients Backward(double error, Gradients nodeSteps)
     {
         double nextLayerError = 1;
         if (Layer.NextLayer != null)
@@ -100,11 +100,11 @@ public class Node : INode
         for (int weightIndex = 0; weightIndex < Weights.Length; weightIndex++)
         {
             double input = Xs[weightIndex];
-            nodeSteps.WeightSteps[weightIndex] += gradient * input;
+            nodeSteps.WeightGradient[weightIndex] += gradient * input;
 //            Console.Write($"x={Xs[weightIndex]} Layer: {Layer.Index} Node: {Index} Weight: {weightIndex} WeightStep {gradient * input} " );
         }
         double biasGradient = gradient;
-        nodeSteps.BiasStep += biasGradient;
+        nodeSteps.BiasGradient += biasGradient;
 //        Console.WriteLine($"Bias {biasGradient}");
         return nodeSteps;
     }

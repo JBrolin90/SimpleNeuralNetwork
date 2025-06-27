@@ -4,9 +4,37 @@ namespace BackPropagation.NNLib;
 
 public static class LossFunctions
 {
-    public static double[] SumSquaredError(double[][] predicted, double[][] actual)
+    public static double[] SquaredError(double[] predicted, double[] observed)
     {
-        if (predicted.Length != actual.Length)
+        if (predicted.Length != observed.Length)
+            throw new ArgumentException("Arrays must be of the same length");
+
+        int count = predicted.Length;
+        double[] errors = new double[count];
+        for (int i = 0; i < count; i++)
+        {
+            double diff = (predicted[i] - observed[i]);
+            errors[i] = diff * diff;
+        }
+        return errors;
+    }
+    public static double[] SquaredErrorDerivative(double[] predicted, double[] observed)
+    {
+        if (predicted.Length != observed.Length)
+            throw new ArgumentException("Arrays must be of the same length");
+
+        int count = predicted.Length;
+        double[] errors = new double[count];
+        for (int i = 0; i < count; i++)
+        {
+            double diff = (predicted[i] - observed[i]);
+            errors[i] = 2 * diff;
+        }
+        return errors;
+    }
+    public static double[] SumSquaredError(double[][] predicted, double[][] observed)
+    {
+        if (predicted.Length != observed.Length)
             throw new ArgumentException("Arrays must be of the same length");
 
         int outputCount = predicted[0].Length;
@@ -16,15 +44,15 @@ public static class LossFunctions
             for (int outputIndex = 0; outputIndex < outputCount; outputIndex++)
             {
                 double[] diff = new double[outputCount];
-                diff[outputIndex] = predicted[predictionIndex][outputIndex] - actual[predictionIndex][outputIndex];
+                diff[outputIndex] = predicted[predictionIndex][outputIndex] - observed[predictionIndex][outputIndex];
                 sum[outputIndex] += diff[outputIndex] * diff[outputIndex];
             }
         }
         return sum;
     }
-    public static double[] SumSquaredErrorDerivative(double[][] predicted, double[][] actual)
+    public static double[] SumSquaredErrorDerivative(double[][] predicted, double[][] observed)
     {
-        if (predicted.Length != actual.Length)
+        if (predicted.Length != observed.Length)
             throw new ArgumentException("Arrays must be of the same length");
 
         int outputCount = predicted[0].Length;
@@ -34,7 +62,7 @@ public static class LossFunctions
             for (int outputIndex = 0; outputIndex < outputCount; outputIndex++)
             {
                 double[] diff = new double[outputCount];
-                diff[outputIndex] = predicted[predictionIndex][outputIndex] - actual[predictionIndex][outputIndex];
+                diff[outputIndex] = predicted[predictionIndex][outputIndex] - observed[predictionIndex][outputIndex];
                 sum[outputIndex] += 2 * diff[outputIndex];
             }
         }

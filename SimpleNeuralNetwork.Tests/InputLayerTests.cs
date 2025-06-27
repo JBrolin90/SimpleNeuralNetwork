@@ -90,7 +90,7 @@ namespace SimpleNeuralNetwork.Tests
             // Process some inputs first
             inputLayer.Forward(new double[] { 1.0 });
             
-            var nodeSteps = new NodeSteps[] { new NodeSteps(1) };
+            var nodeSteps = new Gradients[] { new Gradients(1) };
             double error = 0.1;
 
             // Act

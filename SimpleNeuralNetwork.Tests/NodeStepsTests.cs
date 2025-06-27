@@ -15,11 +15,11 @@ namespace SimpleNeuralNetwork.Tests
             int weightCount = 3;
 
             // Act
-            var nodeSteps = new NodeSteps(weightCount);
+            var nodeSteps = new Gradients(weightCount);
 
             // Assert
-            Assert.Equal(weightCount, nodeSteps.WeightSteps.Length);
-            Assert.All(nodeSteps.WeightSteps, step => Assert.Equal(0.0, step));
+            Assert.Equal(weightCount, nodeSteps.WeightGradient.Length);
+            Assert.All(nodeSteps.WeightGradient, step => Assert.Equal(0.0, step));
         }
 
         [Fact]
@@ -29,10 +29,10 @@ namespace SimpleNeuralNetwork.Tests
             int weightCount = 5;
 
             // Act
-            var nodeSteps = new NodeSteps(weightCount);
+            var nodeSteps = new Gradients(weightCount);
 
             // Assert
-            Assert.Equal(0.0, nodeSteps.BiasStep);
+            Assert.Equal(0.0, nodeSteps.BiasGradient);
         }
 
         [Theory]
@@ -42,29 +42,29 @@ namespace SimpleNeuralNetwork.Tests
         public void NodeSteps_Constructor_WithVariousWeightCounts_CreatesCorrectArraySize(int weightCount)
         {
             // Act
-            var nodeSteps = new NodeSteps(weightCount);
+            var nodeSteps = new Gradients(weightCount);
 
             // Assert
-            Assert.Equal(weightCount, nodeSteps.WeightSteps.Length);
+            Assert.Equal(weightCount, nodeSteps.WeightGradient.Length);
         }
 
         [Fact]
         public void NodeSteps_WeightSteps_CanBeModified()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(3);
+            var nodeSteps = new Gradients(3);
             double[] newWeightSteps = { 0.1, 0.2, 0.3 };
 
             // Act
             for (int i = 0; i < newWeightSteps.Length; i++)
             {
-                nodeSteps.WeightSteps[i] = newWeightSteps[i];
+                nodeSteps.WeightGradient[i] = newWeightSteps[i];
             }
 
             // Assert
             for (int i = 0; i < newWeightSteps.Length; i++)
             {
-                Assert.Equal(newWeightSteps[i], nodeSteps.WeightSteps[i], 7);
+                Assert.Equal(newWeightSteps[i], nodeSteps.WeightGradient[i], 7);
             }
         }
 
@@ -72,116 +72,116 @@ namespace SimpleNeuralNetwork.Tests
         public void NodeSteps_BiasStep_CanBeModified()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(2);
+            var nodeSteps = new Gradients(2);
             double newBiasStep = 0.5;
 
             // Act
-            nodeSteps.BiasStep = newBiasStep;
+            nodeSteps.BiasGradient = newBiasStep;
 
             // Assert
-            Assert.Equal(newBiasStep, nodeSteps.BiasStep, 7);
+            Assert.Equal(newBiasStep, nodeSteps.BiasGradient, 7);
         }
 
         [Fact]
         public void NodeSteps_WeightSteps_AccumulatesValues()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(2);
+            var nodeSteps = new Gradients(2);
 
             // Act
-            nodeSteps.WeightSteps[0] += 0.1;
-            nodeSteps.WeightSteps[0] += 0.2;
-            nodeSteps.WeightSteps[1] += 0.3;
+            nodeSteps.WeightGradient[0] += 0.1;
+            nodeSteps.WeightGradient[0] += 0.2;
+            nodeSteps.WeightGradient[1] += 0.3;
 
             // Assert
-            Assert.Equal(0.3, nodeSteps.WeightSteps[0], 7);
-            Assert.Equal(0.3, nodeSteps.WeightSteps[1], 7);
+            Assert.Equal(0.3, nodeSteps.WeightGradient[0], 7);
+            Assert.Equal(0.3, nodeSteps.WeightGradient[1], 7);
         }
 
         [Fact]
         public void NodeSteps_BiasStep_AccumulatesValues()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(1);
+            var nodeSteps = new Gradients(1);
 
             // Act
-            nodeSteps.BiasStep += 0.1;
-            nodeSteps.BiasStep += 0.2;
+            nodeSteps.BiasGradient += 0.1;
+            nodeSteps.BiasGradient += 0.2;
 
             // Assert
-            Assert.Equal(0.3, nodeSteps.BiasStep, 7);
+            Assert.Equal(0.3, nodeSteps.BiasGradient, 7);
         }
 
         [Fact]
         public void NodeSteps_Constructor_WithZeroWeights_CreatesEmptyArray()
         {
             // Act
-            var nodeSteps = new NodeSteps(0);
+            var nodeSteps = new Gradients(0);
 
             // Assert
-            Assert.Empty(nodeSteps.WeightSteps);
-            Assert.Equal(0.0, nodeSteps.BiasStep);
+            Assert.Empty(nodeSteps.WeightGradient);
+            Assert.Equal(0.0, nodeSteps.BiasGradient);
         }
 
         [Fact]
         public void NodeSteps_WeightSteps_SupportsNegativeValues()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(2);
+            var nodeSteps = new Gradients(2);
 
             // Act
-            nodeSteps.WeightSteps[0] = -0.5;
-            nodeSteps.WeightSteps[1] = -1.2;
+            nodeSteps.WeightGradient[0] = -0.5;
+            nodeSteps.WeightGradient[1] = -1.2;
 
             // Assert
-            Assert.Equal(-0.5, nodeSteps.WeightSteps[0], 7);
-            Assert.Equal(-1.2, nodeSteps.WeightSteps[1], 7);
+            Assert.Equal(-0.5, nodeSteps.WeightGradient[0], 7);
+            Assert.Equal(-1.2, nodeSteps.WeightGradient[1], 7);
         }
 
         [Fact]
         public void NodeSteps_BiasStep_SupportsNegativeValues()
         {
             // Arrange
-            var nodeSteps = new NodeSteps(1);
+            var nodeSteps = new Gradients(1);
 
             // Act
-            nodeSteps.BiasStep = -0.8;
+            nodeSteps.BiasGradient = -0.8;
 
             // Assert
-            Assert.Equal(-0.8, nodeSteps.BiasStep, 7);
+            Assert.Equal(-0.8, nodeSteps.BiasGradient, 7);
         }
 
         [Fact]
         public void NodeSteps_WeightSteps_ArrayReference_IsIndependent()
         {
             // Arrange
-            var nodeSteps1 = new NodeSteps(2);
-            var nodeSteps2 = new NodeSteps(2);
+            var nodeSteps1 = new Gradients(2);
+            var nodeSteps2 = new Gradients(2);
 
             // Act
-            nodeSteps1.WeightSteps[0] = 1.0;
-            nodeSteps2.WeightSteps[0] = 2.0;
+            nodeSteps1.WeightGradient[0] = 1.0;
+            nodeSteps2.WeightGradient[0] = 2.0;
 
             // Assert
-            Assert.Equal(1.0, nodeSteps1.WeightSteps[0], 7);
-            Assert.Equal(2.0, nodeSteps2.WeightSteps[0], 7);
-            Assert.NotSame(nodeSteps1.WeightSteps, nodeSteps2.WeightSteps);
+            Assert.Equal(1.0, nodeSteps1.WeightGradient[0], 7);
+            Assert.Equal(2.0, nodeSteps2.WeightGradient[0], 7);
+            Assert.NotSame(nodeSteps1.WeightGradient, nodeSteps2.WeightGradient);
         }
 
         [Fact]
         public void NodeSteps_MultiplePensionsteps_IndependentBiasSteps()
         {
             // Arrange
-            var nodeSteps1 = new NodeSteps(1);
-            var nodeSteps2 = new NodeSteps(1);
+            var nodeSteps1 = new Gradients(1);
+            var nodeSteps2 = new Gradients(1);
 
             // Act
-            nodeSteps1.BiasStep = 1.5;
-            nodeSteps2.BiasStep = 2.5;
+            nodeSteps1.BiasGradient = 1.5;
+            nodeSteps2.BiasGradient = 2.5;
 
             // Assert
-            Assert.Equal(1.5, nodeSteps1.BiasStep, 7);
-            Assert.Equal(2.5, nodeSteps2.BiasStep, 7);
+            Assert.Equal(1.5, nodeSteps1.BiasGradient, 7);
+            Assert.Equal(2.5, nodeSteps2.BiasGradient, 7);
         }
     }
 }

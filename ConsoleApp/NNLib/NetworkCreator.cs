@@ -47,13 +47,39 @@ public class NetworkCreator
 
     public void RandomizeWeights(double from, double to)
     {
-        for (int i = 0; i < Weights.Length; i++) // Exclude output layer
+        double NextDouble(double _) => new Random().NextDouble() * (to - from) - (to - from) / 2;
+        ApplyOn3dArr(Weights, NextDouble);
+
+    }
+
+    public static void ActOn3dArr(double[][][] arr, Action<double> action)
+    {
+        int layerCount = arr.Length;
+        for (int i = 0; i < layerCount; i++)
         {
-            for (int j = 0; j < Weights[i].Length; j++)
+            int nodeCount = arr[i].Length;
+            for (int j = 0; j < nodeCount; j++)
             {
-                for (int k = 0; k < Weights[i][j].Length; k++)
+                int inputCount = arr[i][j].Length;
+                for (int k = 0; k < inputCount; k++)
                 {
-                    Weights[i][j][k] = new Random().NextDouble()*(to-from)-(to-from)/2;
+                    action(arr[i][j][k]);
+                }
+            }
+        }
+    }
+    public static void ApplyOn3dArr(double[][][] arr, Func<double, double> func)
+    {
+        int layerCount = arr.Length;
+        for (int i = 0; i < layerCount; i++)
+        {
+            int nodeCount = arr[i].Length;
+            for (int j = 0; j < nodeCount; j++)
+            {
+                int inputCount = arr[i][j].Length;
+                for (int k = 0; k < inputCount; k++)
+                {
+                    arr[i][j][k] = func(arr[i][j][k]);
                 }
             }
         }

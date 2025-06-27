@@ -40,7 +40,7 @@ public interface ILayer
     public ILayer? NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
-    NodeSteps[] Backward(double dSSR, NodeSteps[] steps);
+    Gradients[] Backward(double dSSR, Gradients[] steps);
     double CalculateLayerErrorRecursively(int index);
     double GetBiasChainFactor();
 }
@@ -114,7 +114,7 @@ public class Layer : ILayer
     #endregion
     #region Backward
 
-    public virtual NodeSteps[] Backward(double dSSR, NodeSteps[] nodeSteps)
+    public virtual Gradients[] Backward(double dSSR, Gradients[] nodeSteps)
     {
         for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
         {
