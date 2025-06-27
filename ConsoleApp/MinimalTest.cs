@@ -6,7 +6,7 @@ namespace BackPropagation;
 
 public class MinimalTest
 {
-    const int epochs = 1;
+    const int epochs = 900000;
     double[][] samples = [];
     NeuralNetworkTrainer? network;
 
@@ -29,7 +29,10 @@ public class MinimalTest
         for (int i = 0; i < epochs; i++)
         {
             double[] loss = network!.TrainOneEpoch(samples, [[0], [1], [0]]);
-            Console.WriteLine($"Loss = {loss[0]}\n");
+            if (epochs % (epochs / 10) == 0)
+            {
+                //Console.WriteLine($"Epoch: {i}");
+            }
         }
     }
 
@@ -55,22 +58,30 @@ public class MinimalTest
             ];
 
 
-        int layerCount = Weigths.Length;
-        for (int i = 0; i < layerCount; i++)
+
+        // int layerCount = Weigths.Length;
+        // for (int i = 0; i < layerCount; i++)
+        // {
+        //     int nodeCount = Weigths[i].Length;
+        //     for (int j = 0; j < nodeCount; j++)
+        //     {
+        //         int inputCount = Weigths[i][j].Length;
+        //         for (int k = 0; k < inputCount; k++)
+        //         {
+        //             network!.Weigths[i][j][k] = Weigths[i][j][k];
+        //         }
+        //     }
+        // }
+
+
+        Train();
+        static void print(double val)
         {
-            int nodeCount = Weigths[i].Length;
-            for (int j = 0; j < nodeCount; j++)
-            {
-                int inputCount = Weigths[i][j].Length;
-                for (int k = 0; k < inputCount; k++)
-                {
-                    network!.Weigths[i][j][k] = Weigths[i][j][k];
-                }
-            }
+            Console.WriteLine($"Weight: {val}");    
         }
-
-
-            Train();
+        NetworkCreator.ActOn3dArr(network!.Weigths, print);
+        Console.WriteLine();
+        NetworkCreator.ActOn3dArr(network!.Biases, print);
 
         Console.WriteLine("After training:");
         var prediction = network!.Predict([0]);
