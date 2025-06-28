@@ -9,7 +9,7 @@ internal class Program
 
         //new StatQuestPart2();
         //new StatQuestPart2Random();
-        // new AlgebraTest().DoIt();
-        new MinimalTest().DoIt();
+        new AlgebraTest().DoIt();
+        //new MinimalTest().DoIt();
     }
 }

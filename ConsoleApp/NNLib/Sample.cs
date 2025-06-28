@@ -9,7 +9,8 @@ public class Sample
     private double observed;
     public double[] Xample => _sample;
     public double Observed => observed;
-    public Sample(double a, double b, Operation op)
+
+    public Sample(double a, double b, Operation op, double normalizer)
     {
         int i = 0;
         _sample[i++] = a;
@@ -24,7 +25,9 @@ public class Sample
         {
             _sample[i++] = 1;
             _sample[i++] = 0;
-            observed = Math.Sqrt(a * a + b * b);
+            double A = a * normalizer;
+            double B = b * normalizer;
+            observed = Math.Sqrt(A * A + B * B);
         }
     }
 }

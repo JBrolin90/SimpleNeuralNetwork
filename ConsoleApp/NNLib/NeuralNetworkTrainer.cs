@@ -7,10 +7,19 @@ using System.Runtime.Intrinsics.Arm;
 namespace BackPropagation.NNLib;
 
 
-public class Gradients(int weightCount)
+public class Gradients
 {
-    public double[] WeightGradient = new double[weightCount];
+    public double[] WeightGradient;
     public double BiasGradient = 0;
+
+    public Gradients(int weightCount)
+    {
+        WeightGradient = new double[weightCount];
+        for (int i = 0; i < weightCount; i++)
+        {
+            WeightGradient[i] = 0;
+        }
+    }
 }
 
 public class NeuralNetworkTrainer : NeuralNetwork
@@ -53,7 +62,6 @@ public class NeuralNetworkTrainer : NeuralNetwork
         dLoss = new double[observed[0].Length];
         for (int i = 0; i < trainingData.Length; i++)
         {
-            Console.WriteLine($"SAMPLE #{i}");
             // Forward pass
             predictions[i] = Predict(trainingData[i]);
             double[] lossPart = LossFunctions.SquaredError(predictions[i], observed[i]);
@@ -65,7 +73,6 @@ public class NeuralNetworkTrainer : NeuralNetwork
                 dLoss[j] += dLossPart[j];
             }
             PropagateBackwards(dLossPart);
-            Console.WriteLine();
         }
         UpdateWeightsAndBiases();
 
@@ -73,21 +80,26 @@ public class NeuralNetworkTrainer : NeuralNetwork
     }
     public double[] TrainOneEpoch(Sample[] trainingData)
     {
-        int outputCount = Layers[^1].Nodes.Length;
-        double[][] expectedOutputs = new double[trainingData.Length][];
-
         double[][] predictions = new double[trainingData.Length][];
+        PrepareBackPropagation();
+        ResetGradients();
+        loss = new double[trainingData.Length];
+        dLoss = new double[trainingData.Length];
         for (int i = 0; i < trainingData.Length; i++)
         {
             // Forward pass
             predictions[i] = Predict(trainingData[i].Xample);
-            expectedOutputs[i] = [trainingData[i].Observed];
+            double[] lossPart = LossFunctions.SquaredError(predictions[i], [trainingData[i].Observed]);
+            double[] dLossPart = LossFunctions.SquaredErrorDerivative(predictions[i], [trainingData[i].Observed]);
+            int count = predictions[i].Length;
+            for (int j = 0; j < count; j++)
+            {
+                loss[j] += lossPart[j];
+                dLoss[j] += dLossPart[j];
+            }
+            PropagateBackwards(dLossPart);
         }
-        loss = LossFunction(predictions, expectedOutputs);
-        dLoss = LossFunctionD(predictions, expectedOutputs);
-        PrepareBackPropagation();
-        ResetGradients();
-        PropagateBackwards(dLoss);  //BackPropagateRecursive(dSSR);
+        // UpdateWeightsAndBiases(trainingData.Length);
         UpdateWeightsAndBiases();
 
         return loss;
@@ -197,13 +209,13 @@ public class NeuralNetworkTrainer : NeuralNetwork
             double input = (weightIndex < layerInputs.Length) ? layerInputs[weightIndex] : 0;
             double gradient = error * activationDerivative * input;
             Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex] += gradient;
-            Console.WriteLine($"Weight Gradient [l{layerIndex}, n{nodeIndex}, w{weightIndex}] = isol: {gradient} Sum: {Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex]}");
+        //    Console.WriteLine($"Weight Gradient [l{layerIndex}, n{nodeIndex}, w{weightIndex}] = isol: {gradient} Sum: {Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex]}");
         }
 
         // Calculate bias gradient
         double biasGradient = error * node.ActivationDerivative(node.Sum) * 1;
         Gradients[layerIndex][nodeIndex].BiasGradient += biasGradient;
-        Console.WriteLine($"Bias Gradient [l{layerIndex}, n{nodeIndex}] = isol: {biasGradient} Sum {Gradients[layerIndex][nodeIndex].BiasGradient}");
+        //Console.WriteLine($"Bias Gradient [l{layerIndex}, n{nodeIndex}] = isol: {biasGradient} Sum {Gradients[layerIndex][nodeIndex].BiasGradient}");
     }
 
     private double CalculateErrorFromNextLayer(int currentLayerIndex, int currentNodeIndex)
@@ -234,7 +246,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
         return totalError;
     }
 
-    private void UpdateWeightsAndBiases()
+    private void UpdateWeightsAndBiases(int divisor = 1)
     {
         // Update weights and biases
         for (int j1 = 0; j1 < Weigths.Length; j1++)
@@ -243,11 +255,11 @@ public class NeuralNetworkTrainer : NeuralNetwork
             {
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
-                    double deltaW = Gradients[j1][k1].WeightGradient[l];
-                    Weigths[j1][k1][l] -= deltaW * LearningRate;
+                    double wGradient = Gradients[j1][k1].WeightGradient[l];
+                    Weigths[j1][k1][l] -= wGradient * LearningRate;
                 }
-                double deltaB = Gradients[j1][k1].BiasGradient;
-                Biases[j1][k1][0] -= deltaB * LearningRate;
+                double bGradient = Gradients[j1][k1].BiasGradient;
+                Biases[j1][k1][0] -= bGradient * LearningRate /divisor;
             }
         }
     }

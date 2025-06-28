@@ -68,7 +68,7 @@ public static class LossFunctions
         }
         return sum;
     }
-    public static double[] MeanSquaredError(double[][] predicted, double[][] actual)
+    public static double[] SumMeanSquaredError(double[][] predicted, double[][] actual)
     {
         if (predicted.Length != actual.Length)
             throw new ArgumentException("Arrays must be of the same length");
@@ -91,7 +91,7 @@ public static class LossFunctions
         return sum;
     }
 
-    public static double[] MeanSquaredErrorDerivative(double[][] predicted, double[][] actual)
+    public static double[] SumMeanSquaredErrorDerivative(double[][] predicted, double[][] actual)
     {
         if (predicted.Length != actual.Length)
             throw new ArgumentException("Arrays must be of the same length");
