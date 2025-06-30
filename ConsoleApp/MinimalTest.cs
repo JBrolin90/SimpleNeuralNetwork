@@ -8,7 +8,8 @@ public class MinimalTest
 {
     const int epochs = 900000;
     double[][] samples = [];
-    NeuralNetworkTrainer? network;
+    INeuralNetwork? network;
+    NeuralNetworkTrainer? trainer;
 
     public void CreateTrainingData(int sampleCount = 3)
     {
@@ -21,14 +22,15 @@ public class MinimalTest
         Func<double, double>[] af = [ActivationFunctions.SoftPlus, ActivationFunctions.Unit, ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(1, [2, 1], af);
         networkCreator.RandomizeWeights(-2, 2);
-        network = networkCreator.CreateNetwork(0.001);
+        network = networkCreator.CreateNetwork();
+        trainer = new(network, 0.01);
     }
 
     public void Train()
     {
         for (int i = 0; i < epochs; i++)
         {
-            double[] loss = network!.TrainOneEpoch(samples, [[0], [1], [0]]);
+            double[] loss = trainer!.TrainOneEpoch(samples, [[0], [1], [0]]);
             if (epochs % (epochs / 10) == 0)
             {
                 //Console.WriteLine($"Epoch: {i}");
@@ -56,22 +58,6 @@ public class MinimalTest
             [[2.74], [-1.13]],
             [[0.36, 0.63]],
             ];
-
-
-
-        // int layerCount = Weigths.Length;
-        // for (int i = 0; i < layerCount; i++)
-        // {
-        //     int nodeCount = Weigths[i].Length;
-        //     for (int j = 0; j < nodeCount; j++)
-        //     {
-        //         int inputCount = Weigths[i][j].Length;
-        //         for (int k = 0; k < inputCount; k++)
-        //         {
-        //             network!.Weigths[i][j][k] = Weigths[i][j][k];
-        //         }
-        //     }
-        // }
 
 
         Train();

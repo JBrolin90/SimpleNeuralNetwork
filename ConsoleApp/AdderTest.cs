@@ -11,7 +11,8 @@ public class AdderTest
     const double learningRate = 0.025;
     double[][] samples = [];
     double[][] observed = [];
-    NeuralNetworkTrainer? network;
+    INeuralNetwork? network;
+    NeuralNetworkTrainer? trainer;
 
     public void CreateTrainingData()
     {
@@ -24,7 +25,8 @@ public class AdderTest
     {
         Func<double, double>[] af = [ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(2, [1], af);
-        network = networkCreator.CreateNetwork(learningRate);
+        network = networkCreator.CreateNetwork();
+        trainer = new(network, 0.01);
     }
 
     internal class EpochVerifier
@@ -84,12 +86,12 @@ public class AdderTest
         EpochVerifier epochVerifier = new();
         for (int i = 0; i < epochs; i++)
         {
-            network!.TrainOneEpoch(samples, observed);
+            trainer!.TrainOneEpoch(samples, observed);
             epochVerifier.VerifyEpoch(samples, observed);
 
-            bool same = network.Weigths[0][0][0] == epochVerifier.w1;
-            same &= network.Weigths[0][0][1] == epochVerifier.w2;
-            same &= network.Biases[0][0][0] == epochVerifier.b;
+            bool same = network!.Weigths[0][0][0] == epochVerifier.w1;
+            same &= network!.Weigths[0][0][1] == epochVerifier.w2;
+            same &= network!.Biases[0][0][0] == epochVerifier.b;
             bool different = !same;
             if (different)
             {

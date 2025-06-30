@@ -10,7 +10,8 @@ public class AlgebraTest
     const int epochs = 500000;
     Sample[] samples = [];
     readonly Random rnd = new();
-    NeuralNetworkTrainer? network;
+    INeuralNetwork? network;
+    NeuralNetworkTrainer? trainer;
 
     private double normalizer = 1;
 
@@ -39,7 +40,9 @@ public class AlgebraTest
 
         // Initialize weights with random values
         networkCreator.RandomizeWeights(-1, 1);
-        network = networkCreator.CreateNetwork(0.001);
+        network = networkCreator.CreateNetwork();
+        trainer = new(network, 0.001);
+        
     }
 
     public double Train()
@@ -47,7 +50,7 @@ public class AlgebraTest
         double[] loss = new double[1];
         for (int i = 0; i < epochs; i++)
         {
-            loss = network!.TrainOneEpoch(samples);
+            loss = trainer!.TrainOneEpoch(samples);
             if (i % (epochs / 10) == 0)
             {
                 Console.WriteLine($"Epoch {i} => Loss = {loss[0]}");

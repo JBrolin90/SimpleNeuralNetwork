@@ -24,8 +24,9 @@ public class StatQuestPart2
 
     public StatQuestPart2()
     {
-        NeuralNetworkTrainer nn1 = new(new LayerFactory(), new NeuronFactory(),
-    weights, biases, ys, 0.01, activationFunctions);
+        NeuralNetwork nn1 = new(new LayerFactory(), new NeuronFactory(),
+    weights, biases, ys, activationFunctions);
+        NeuralNetworkTrainer trainer = new(nn1, 0.1);
 
         double[] output0 = nn1.Predict([0]);
         double[] output1 = nn1.Predict([0.5]);
@@ -36,7 +37,7 @@ public class StatQuestPart2
 
         for (int i = 0; i < epochs; i++)
         {
-            nn1.TrainOneEpoch(samples, observed);
+            trainer.TrainOneEpoch(samples, observed);
         }
         //        Console.WriteLine($"SSR nn1: {nn1.SSR[0]}");
     }

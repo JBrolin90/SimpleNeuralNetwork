@@ -9,7 +9,9 @@ public class OneNeuronTest
 {
     const int epochs = 500;
     double[] samples = [];
-    NeuralNetworkTrainer? network;
+
+    INeuralNetwork? network;
+    NeuralNetworkTrainer? trainer;
 
     public double[] CreateTrainingData()
     {
@@ -22,7 +24,8 @@ public class OneNeuronTest
         Func<double, double>[] af = [ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(1, [1], af);
         //networkCreator.RandomizeWeights(-2, 2);
-        network = networkCreator.CreateNetwork(0.1);
+        network = networkCreator.CreateNetwork();
+        trainer = new(network, 0.1);
     }
 
     internal class EpochVerifier
@@ -82,7 +85,7 @@ public class OneNeuronTest
         {
             double[] observed = [0.3, 0.6];
             Console.WriteLine($"Epoch: {i}");
-            network!.TrainOneEpoch( [ [0], [1] ] , [[0.3], [0.6]]);
+            trainer!.TrainOneEpoch( [ [0], [1] ] , [[0.3], [0.6]]);
             Console.WriteLine();
             epochVerifier.VerifyEpoch(samples, observed);
             Console.WriteLine();

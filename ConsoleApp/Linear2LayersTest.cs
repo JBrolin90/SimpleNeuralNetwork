@@ -11,7 +11,8 @@ public class Linear2LayersTest
     const double learningRate = 0.1;
     double[][] samples = [];
     double[][] observed = [];
-    NeuralNetworkTrainer? network;
+    INeuralNetwork? network;
+    NeuralNetworkTrainer? trainer;
 
     public void CreateTrainingData()
     {
@@ -24,7 +25,8 @@ public class Linear2LayersTest
     {
         Func<double, double>[] af = [ActivationFunctions.Unit, ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(1, [1, 1], af);
-        network = networkCreator.CreateNetwork(learningRate);
+        network = networkCreator.CreateNetwork();
+        trainer = new(network, learningRate);
     }
 
     internal class TwoLayerNetwork
@@ -93,7 +95,7 @@ public class Linear2LayersTest
         TwoLayerNetwork epochVerifier = new();
         for (int i = 0; i < epochs; i++)
         {
-            network!.TrainOneEpoch(samples, observed);
+            trainer!.TrainOneEpoch(samples, observed);
             epochVerifier.VerifyEpoch(samples, observed);
 
             bool same = network.Weigths[0][0][0] == epochVerifier.w[0];

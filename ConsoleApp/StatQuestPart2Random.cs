@@ -20,11 +20,12 @@ public class StatQuestPart2Random
     {
         NetworkCreator creator = new(1, [2, 1], activationFunctions);
         creator.RandomizeWeights(-0.3, 0.3);
-        NeuralNetworkTrainer nn2 = creator.CreateNetwork();
+        INeuralNetwork nn2 = creator.CreateNetwork();
+        NeuralNetworkTrainer trainer = new(nn2, 0.1);
 
         for (int i = 0; i < epochs; i++)
         {
-            nn2.TrainOneEpoch(samples, observed);
+            trainer.TrainOneEpoch(samples, observed);
         }
         //        Console.WriteLine($"SSR nn2: {nn2.SSR[0]}");
     }
