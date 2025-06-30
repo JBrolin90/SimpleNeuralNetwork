@@ -10,11 +10,13 @@ public class AdderTest
     const int epochs = 2000;
     const double learningRate = 0.025;
     double[][] samples = [];
+    double[][] observed = [];
     NeuralNetworkTrainer? network;
 
-    public double[][] CreateTrainingData()
+    public void CreateTrainingData()
     {
-        return samples = [[5,5], [2,2]];
+        samples = [[5, 5], [2, 2]];
+        observed = [[10], [4]];
     }
 
 
@@ -62,12 +64,12 @@ public class AdderTest
             // Console.WriteLine($"o:{observed}, i1:{i1}, w1{w1}, b{b}, XY{y}, L{loss}, dL{dLoss}, wGrd1{wGrad1}, bGrd{bGrad}, wGS1{wGrad1Sum}, bGS{bGradSum}");
         }
 
-        internal void VerifyEpoch(double[][] samples, double[] observed)
+        internal void VerifyEpoch(double[][] samples, double[][] observed)
         {
             wGrad1Sum = wGrad2Sum = bGradSum = 0;
             for (int i = 0; i < samples.Length; i++)
             {
-                VerifyPrediction(samples[i][0], samples[i][1], observed[i]);
+                VerifyPrediction(samples[i][0], samples[i][1], observed[i][0]);
             }
             w1 -= wGrad1Sum * learningRate / samples.Length;
             w2 -= wGrad2Sum * learningRate / samples.Length;
@@ -82,12 +84,9 @@ public class AdderTest
         EpochVerifier epochVerifier = new();
         for (int i = 0; i < epochs; i++)
         {
-            double[] observed = [10, 4];
-            Console.WriteLine($"Epoch: {i}");
-            network!.TrainOneEpoch(samples, [[10], [4]]);
-            Console.WriteLine();
+            network!.TrainOneEpoch(samples, observed);
             epochVerifier.VerifyEpoch(samples, observed);
-            Console.WriteLine();
+
             bool same = network.Weigths[0][0][0] == epochVerifier.w1;
             same &= network.Weigths[0][0][1] == epochVerifier.w2;
             same &= network.Biases[0][0][0] == epochVerifier.b;
