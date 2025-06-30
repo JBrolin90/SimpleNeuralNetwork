@@ -73,6 +73,12 @@ public class NeuralNetworkTrainer : NeuralNetwork
                 dLoss[j] += dLossPart[j];
             }
             PropagateBackwards(dLossPart);
+            var node = Layers[0].Nodes[0];
+            var wGrd = Gradients[0][0].WeightGradient[0];
+            var bGrd = Gradients[0][0].BiasGradient;
+            var w = Weigths[0][0][0];
+            var b = Biases[0][0][0];
+            Console.WriteLine($"o:{observed[i][0]}, i:{trainingData[i][0]}, w{w}, b{b}, XY{node.Sum} L{lossPart[0]}, dL{dLossPart[0]}, wGrd{wGrd}, bGrd{bGrd} ");
         }
         UpdateWeightsAndBiases();
 
