@@ -11,6 +11,7 @@ internal class Program
         //new StatQuestPart2Random();
         //new AlgebraTest().DoIt();
         //new MinimalTest().DoIt();
-        new OneNeuronTest().DoIt();
+        //new OneNeuronTest().DoIt();
+        new AdderTest().DoIt();
     }
 }
