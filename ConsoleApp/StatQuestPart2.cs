@@ -24,7 +24,7 @@ public class StatQuestPart2
 
     public StatQuestPart2()
     {
-        NeuralNetworkTrainer nn1 = new(new LayerFactory(), new NodeFactory(),
+        NeuralNetworkTrainer nn1 = new(new LayerFactory(), new NeuronFactory(),
     weights, biases, ys, 0.01, activationFunctions);
 
         double[] output0 = nn1.Predict([0]);

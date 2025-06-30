@@ -87,7 +87,7 @@ public class NetworkCreator
 
     public NeuralNetworkTrainer CreateNetwork(double trainingRate = 0.001)
     {
-        NeuralNetworkTrainer n = new(new LayerFactory(), new NodeFactory(),
+        NeuralNetworkTrainer n = new(new LayerFactory(), new NeuronFactory(),
                         Weights, Biases, Ys,
                         trainingRate, ActivationFunctions);
         return n;

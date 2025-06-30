@@ -13,7 +13,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 1.0, 0.0 } }, // Input layer
                 new double[][] { new double[] { 0.5, 0.5 } }  // Output layer
@@ -46,7 +46,7 @@ namespace SimpleNeuralNetwork.Tests
         public void NeuralNetwork_Constructor_WithNullLayerFactory_ThrowsException()
         {
             // Arrange
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = { new double[][] { new double[] { 1.0 } } };
             double[][][] biases = { new double[][] { new double[] { 0.0 } } };
             double[][] ys = { new double[] { 0.0 } };
@@ -77,7 +77,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 1.0 } }, // Input layer
                 new double[][] { new double[] { 1.0 } }, // Hidden layer
@@ -121,7 +121,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 2.0 } }
             };
@@ -150,7 +150,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 1.0 } }, // Input: pass through
                 new double[][] { new double[] { 2.0 } }  // Output: multiply by 2
@@ -183,7 +183,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 1.0 } },
                 new double[][] { new double[] { 3.0 } }
@@ -219,7 +219,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 2.0 } }
             };
@@ -247,7 +247,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layerFactory = new LayerFactory();
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             double[][][] weights = {
                 new double[][] { new double[] { 1.0 } }
             };

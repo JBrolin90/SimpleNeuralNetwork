@@ -17,7 +17,7 @@ public class InputLayer : Layer
     }
 
 
-    public InputLayer(int index, INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
+    public InputLayer(int index, INeuronFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
     : base(index, NodeFactory, weights, biases, activationFunction)
     {
     }

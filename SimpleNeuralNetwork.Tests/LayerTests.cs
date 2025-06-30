@@ -15,14 +15,14 @@ namespace SimpleNeuralNetwork.Tests
             int index = 1;
             double[][] weights = { new double[] { 0.5, -0.3 }, new double[] { 0.8, 0.2 } };
             double[][] biases = { new double[] { 0.1 }, new double[] { -0.2 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
 
             // Act
             var layer = new Layer(index, nodeFactory, weights, biases, ActivationFunctions.Sigmoid);
 
             // Assert
             Assert.Equal(index, layer.Index);
-            Assert.Equal(2, layer.Nodes.Length);
+            Assert.Equal(2, layer.Neurons.Length);
             Assert.Equal(weights, layer.Weights);
             Assert.Equal(biases, layer.Biases);
         }
@@ -33,7 +33,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0, 0.0 }, new double[] { 0.0, 1.0 } };
             double[][] biases = { new double[] { 0.0 }, new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 2.0, 3.0 };
 
@@ -52,7 +52,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Sigmoid);
             double[] inputs = { 0.0 };
 
@@ -70,7 +70,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 2.0 }, new double[] { -1.0 } };
             double[][] biases = { new double[] { 1.0 }, new double[] { 0.5 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 3.0 };
 
@@ -89,7 +89,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0, 0.5 } };
             double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             
             // Process some inputs first
@@ -115,7 +115,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] layerWeights = { weights };
             double[][] layerBiases = { bias };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, layerWeights, layerBiases, ActivationFunctions.Unit);
 
             // Act
@@ -138,7 +138,7 @@ namespace SimpleNeuralNetwork.Tests
                 new double[] { 0.1 }, 
                 new double[] { 0.2 } 
             };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 3.0, 4.0 };
 
@@ -157,7 +157,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             // No NextLayer set (null)
 
@@ -174,7 +174,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
 
             // Act
@@ -190,7 +190,7 @@ namespace SimpleNeuralNetwork.Tests
             // Arrange
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NodeFactory();
+            var nodeFactory = new NeuronFactory();
             var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 5.0 };
 

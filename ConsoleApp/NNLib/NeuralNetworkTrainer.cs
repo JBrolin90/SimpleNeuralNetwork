@@ -30,7 +30,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
     public double LearningRate = 0;
     public Gradients[][] Gradients = [];
 
-    public NeuralNetworkTrainer(ILayerFactory LayerFactory, INodeFactory NodeFactory,
+    public NeuralNetworkTrainer(ILayerFactory LayerFactory, INeuronFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys,
                         double learningRate = 0.01, Func<double, double>[]? activationFunctions = null)
                         : base(LayerFactory, NodeFactory, weights, biases, ys,
@@ -53,7 +53,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
     double[] dLoss = [];
     public double[] TrainOneEpoch(double[][] trainingData, double[][] observed)
     {
-        int outputCount = Layers[^1].Nodes.Length;
+        int outputCount = Layers[^1].Neurons.Length;
 
         double[][] predictions = new double[trainingData.Length][];
         PrepareBackPropagation();
@@ -73,7 +73,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
                 dLoss[j] += dLossPart[j];
             }
             PropagateBackwards(dLossPart);
-            var node = Layers[0].Nodes[0];
+            var node = Layers[0].Neurons[0];
             var wGrd = Gradients[0][0].WeightGradient[0];
             var bGrd = Gradients[0][0].BiasGradient;
             var w = Weigths[0][0][0];
@@ -86,28 +86,10 @@ public class NeuralNetworkTrainer : NeuralNetwork
     }
     public double[] TrainOneEpoch(Sample[] trainingData)
     {
-        double[][] predictions = new double[trainingData.Length][];
-        PrepareBackPropagation();
-        ResetGradients();
-        loss = new double[trainingData.Length];
-        dLoss = new double[trainingData.Length];
-        for (int i = 0; i < trainingData.Length; i++)
-        {
-            // Forward pass
-            predictions[i] = Predict(trainingData[i].Xample);
-            double[] lossPart = LossFunctions.SquaredError(predictions[i], [trainingData[i].Observed]);
-            double[] dLossPart = LossFunctions.SquaredErrorDerivative(predictions[i], [trainingData[i].Observed]);
-            int count = predictions[i].Length;
-            for (int j = 0; j < count; j++)
-            {
-                loss[j] += lossPart[j];
-                dLoss[j] += dLossPart[j];
-            }
-            PropagateBackwards(dLossPart);
-        }
-        UpdateWeightsAndBiases(trainingData.Length);
+        var xamples = trainingData.Select(s => s.Xample).ToArray();
+        var observed = trainingData.Select(s=>s.Observed).ToArray();
+        return TrainOneEpoch(xamples, observed);
 
-        return loss;
     }
 
 
@@ -118,10 +100,10 @@ public class NeuralNetworkTrainer : NeuralNetwork
         int i = 0;
         foreach (var layer in Layers)
         {
-            Gradients[i] = new Gradients[layer.Nodes.Length];
-            for (int j = 0; j < layer.Nodes.Length; j++)
+            Gradients[i] = new Gradients[layer.Neurons.Length];
+            for (int j = 0; j < layer.Neurons.Length; j++)
             {
-                Gradients[i][j] = new Gradients(layer.Nodes[j].Weights.Length);
+                Gradients[i][j] = new Gradients(layer.Neurons[j].Weights.Length);
             }
             i++;
         }
@@ -143,28 +125,16 @@ public class NeuralNetworkTrainer : NeuralNetwork
     }
 
 
-    public void BackPropagateRecursive(double[] dSSR)
-    {
-        int i = 0;
-        foreach (var layer in Layers)
-        {
-            layer.Backward(dSSR[0], Gradients[i]);
-            i++;
-        }
-    }
-
-
-
-    // Store node errors for each layer during backpropagation
-    private double[][] nodeErrors = Array.Empty<double[]>();
+    // Store neuron errors for each layer during backpropagation
+    private double[][] neuronErrors = Array.Empty<double[]>();
 
     public void PropagateBackwards(double[] dLoss)
     {
         // Initialize error storage for all layers
-        nodeErrors = new double[Layers.Length][];
+        neuronErrors = new double[Layers.Length][];
         for (int i = 0; i < Layers.Length; i++)
         {
-            nodeErrors[i] = new double[Layers[i].Nodes.Length];
+            neuronErrors[i] = new double[Layers[i].Neurons.Length];
         }
 
         // Start from output layer and work backwards
@@ -175,11 +145,11 @@ public class NeuralNetworkTrainer : NeuralNetwork
             if (layerIndex == Layers.Length - 1)
             {
                 // Output layer: use direct error gradients and store them
-                for (int nodeIndex = 0; nodeIndex < layer.Nodes.Length; nodeIndex++)
+                for (int nodeIndex = 0; nodeIndex < layer.Neurons.Length; nodeIndex++)
                 {
-                    var node = layer.Nodes[nodeIndex];
+                    var node = layer.Neurons[nodeIndex];
                     double error = dLoss[nodeIndex];
-                    nodeErrors[layerIndex][nodeIndex] = error;
+                    neuronErrors[layerIndex][nodeIndex] = error;
 
                     // Calculate gradients for this output node
                     CalculateNodeGradients(node, error, layerIndex, nodeIndex);
@@ -188,28 +158,28 @@ public class NeuralNetworkTrainer : NeuralNetwork
             else
             {
                 // Hidden layers: calculate error from ALREADY CALCULATED next layer errors
-                for (int nodeIndex = 0; nodeIndex < layer.Nodes.Length; nodeIndex++)
+                for (int neuronIndex = 0; neuronIndex < layer.Neurons.Length; neuronIndex++)
                 {
-                    var node = layer.Nodes[nodeIndex];
-                    double error = CalculateErrorFromNextLayer(layerIndex, nodeIndex);
-                    nodeErrors[layerIndex][nodeIndex] = error;
+                    var neuron = layer.Neurons[neuronIndex];
+                    double error = CalculateErrorFromNextLayer(layerIndex, neuronIndex);
+                    neuronErrors[layerIndex][neuronIndex] = error;
 
                     // Calculate gradients for this hidden node
-                    CalculateNodeGradients(node, error, layerIndex, nodeIndex);
+                    CalculateNodeGradients(neuron, error, layerIndex, neuronIndex);
                 }
             }
         }
     }
 
-    private void CalculateNodeGradients(INode node, double error, int layerIndex, int nodeIndex)
+    private void CalculateNodeGradients(INeuron neuron, double error, int layerIndex, int nodeIndex)
     {
         // Get the layer inputs for gradient calculation
         var layer = Layers[layerIndex];
         double[] layerInputs = layer.Inputs ?? [];
 
         // Calculate weight gradients
-        double activationDerivative = node.ActivationDerivative(node.Sum);
-        for (int weightIndex = 0; weightIndex < node.Weights.Length; weightIndex++)
+        double activationDerivative = neuron.ActivationDerivative(neuron.Sum);
+        for (int weightIndex = 0; weightIndex < neuron.Weights.Length; weightIndex++)
         {
             double input = (weightIndex < layerInputs.Length) ? layerInputs[weightIndex] : 0;
             double gradient = error * activationDerivative * input;
@@ -218,7 +188,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
         }
 
         // Calculate bias gradient
-        double biasGradient = error * node.ActivationDerivative(node.Sum) * 1;
+        double biasGradient = error * neuron.ActivationDerivative(neuron.Sum) * 1;
         Gradients[layerIndex][nodeIndex].BiasGradient += biasGradient;
         //Console.WriteLine($"Bias Gradient [l{layerIndex}, n{nodeIndex}] = isol: {biasGradient} Sum {Gradients[layerIndex][nodeIndex].BiasGradient}");
     }
@@ -229,9 +199,9 @@ public class NeuralNetworkTrainer : NeuralNetwork
         var nextLayer = Layers[currentLayerIndex + 1];
 
         // Sum errors from all nodes in next layer that this node connects to
-        for (int nextNodeIndex = 0; nextNodeIndex < nextLayer.Nodes.Length; nextNodeIndex++)
+        for (int nextNodeIndex = 0; nextNodeIndex < nextLayer.Neurons.Length; nextNodeIndex++)
         {
-            var nextNode = nextLayer.Nodes[nextNodeIndex];
+            var nextNode = nextLayer.Neurons[nextNodeIndex];
 
             // Get the weight connecting current node to next node
             // dP/dY
@@ -241,7 +211,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
             double activationDerivative = nextNode.ActivationDerivative(nextNode.Sum);
 
             // Use the ALREADY CALCULATED error from next layer (no recursion!)
-            double nextNodeError = nodeErrors[currentLayerIndex + 1][nextNodeIndex];
+            double nextNodeError = neuronErrors[currentLayerIndex + 1][nextNodeIndex];
 
 
             // Add contribution to total error

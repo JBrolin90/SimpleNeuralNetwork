@@ -6,9 +6,9 @@ public enum Operation { add, hypot }
 public class Sample
 {
     private double[] _sample = new double[4];
-    private double observed;
+    private double[] observed = [];
     public double[] Xample => _sample;
-    public double Observed => observed;
+    public double[] Observed => observed;
 
     public Sample(double a, double b, Operation op, double normalizer)
     {
@@ -19,7 +19,7 @@ public class Sample
         {
             _sample[i++] = 0;
             _sample[i++] = 1;
-            observed = a + b;
+            observed[0] = a + b;
         }
         else if (op == Operation.hypot)
         {
@@ -27,7 +27,7 @@ public class Sample
             _sample[i++] = 0;
             double A = a * normalizer;
             double B = b * normalizer;
-            observed = Math.Sqrt(A * A + B * B);
+            observed[0] = Math.Sqrt(A * A + B * B);
         }
     }
 }

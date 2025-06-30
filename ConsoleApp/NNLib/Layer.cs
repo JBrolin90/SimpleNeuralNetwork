@@ -12,12 +12,12 @@ public enum LayerType
 }
 public interface ILayerFactory
 {
-    ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]?  expectedOutputs = null);
+    ILayer Create(int index, INeuronFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]?  expectedOutputs = null);
 }
 
 public class LayerFactory : ILayerFactory
 {
-    public ILayer Create(int index, INodeFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]? expectedOutputs = null)
+    public ILayer Create(int index, INeuronFactory factory, double[][] weights, double[][] biases, Func<double, double>? activationFunctions = null, LayerType layerType = LayerType.Hidden, double[]? expectedOutputs = null)
     {
         if (layerType == LayerType.Input)
         {
@@ -35,14 +35,11 @@ public class LayerFactory : ILayerFactory
 public interface ILayer
 {
     public int Index { get; set; }
-    public INode[] Nodes { get; set; }
+    public INeuron[] Neurons { get; set; }
     public ILayer? PreviousLayer { get; set; }
     public ILayer? NextLayer { get; set; }
     public double[]? Inputs { get; set; }
     double[] Forward(double[] inputs);
-    Gradients[] Backward(double dSSR, Gradients[] steps);
-    double CalculateLayerErrorRecursively(int index);
-    double GetBiasChainFactor();
 }
 #endregion
 
@@ -51,7 +48,7 @@ public class Layer : ILayer
 {
     #region Properties
     public int Index { get; set; } = -1; // Index of the layer in the network
-    public INode[] Nodes { get; set; }
+    public INeuron[] Neurons { get; set; }
     public double[]? Inputs { get; set; }
     public double[][] Weights { get; set; }
     public double[][] Biases { get; set; }
@@ -84,17 +81,17 @@ public class Layer : ILayer
     }
     #endregion
     #region Constructors
-    public Layer(int index, INodeFactory NodeFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
+    public Layer(int index, INeuronFactory NeuronFactory, double[][] weights, double[][] biases, Func<double, double>? activationFunction = null)
     {
         Index = index;
         Weights = weights;
         Biases = biases;
-        Nodes = new INode[Biases.Length];
-        Ys = new double[Nodes.Length];
+        Neurons = new INeuron[Biases.Length];
+        Ys = new double[Neurons.Length];
         ActivationFunction = activationFunction;
         for (int i = 0; i < Biases.Length; i++)
         {
-            Nodes[i] = NodeFactory.Create(this, i, Weights[i], Biases[i], ActivationFunction);
+            Neurons[i] = NeuronFactory.Create(this, i, Weights[i], Biases[i], ActivationFunction);
         }
     }
     #endregion
@@ -102,61 +99,13 @@ public class Layer : ILayer
     public virtual double[] Forward(double[] inputs)
     {
         Inputs = inputs;
-        double[] outputs = new double[Nodes.Length];
-        Ys = new double[Nodes.Length];
-        for (int i = 0; i < Nodes.Length; i++)
+        double[] outputs = new double[Neurons.Length];
+        for (int i = 0; i < Neurons.Length; i++)
         {
-            outputs[i] = Nodes[i].ProcessInputs(Inputs);
-            Ys[i] = outputs[i];
+            outputs[i] = Neurons[i].ProcessInputs(Inputs);
         }
+        Ys = outputs;
         return outputs;
-    }
-    #endregion
-    #region Backward
-
-    public virtual Gradients[] Backward(double dSSR, Gradients[] nodeSteps)
-    {
-        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
-        {
-            nodeSteps[nodeIndex] = Nodes[nodeIndex].Backward(dSSR, nodeSteps[nodeIndex]);
-        }
-        return nodeSteps;
-    }
-
-    //Calculate Layer Error Recursively
-    public virtual double CalculateLayerErrorRecursively(int inputIndex)
-    {
-        if (NextLayer == null)
-        {
-            return 1.0; // Terminal layer, no chain factor multiplication needed
-        }
-
-        double nextLayerError = NextLayer.CalculateLayerErrorRecursively(inputIndex);
-        double thisNodeTotalError = 0;
-        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
-        {
-            var node = Nodes[nodeIndex];
-            var weight = node.Weights[inputIndex];
-            var activationDerivative = node.ActivationDerivative(node.Sum);
-            thisNodeTotalError += nextLayerError * activationDerivative * weight;
-        }
-        return thisNodeTotalError;
-    }
-    
-    public virtual double GetBiasChainFactor()
-    {
-        if (NextLayer == null)
-        {
-            return 1.0; // Terminal layer, no chain factor multiplication needed
-        }
-        
-        double chainFactor = NextLayer.GetBiasChainFactor();
-        double otherChainFactor = 0;
-        for (int nodeIndex = 0; nodeIndex < Nodes.Length; nodeIndex++)
-        {
-            otherChainFactor += Nodes[nodeIndex].BiasDerivative();
-        }
-        return chainFactor * otherChainFactor;
     }
     #endregion
 }

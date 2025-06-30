@@ -18,7 +18,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] bias = { 0.2 };
             
             // Act
-            var node = new Node(layer, index, weights, bias, ActivationFunctions.Sigmoid);
+            var node = new Neuron(layer, index, weights, bias, ActivationFunctions.Sigmoid);
             
             // Assert
             Assert.Equal(layer, node.Layer);
@@ -37,7 +37,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] bias = { 0.2 };
             
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new Node(null!, 0, weights, bias));
+            Assert.Throws<ArgumentNullException>(() => new Neuron(null!, 0, weights, bias));
         }
 
         [Theory]
@@ -48,7 +48,7 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
             
             // Act
             node.ProcessInputs(inputs);
@@ -65,7 +65,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 1.0 };
             double[] bias = { 0.0 };
             double[] inputs = { 0.0 };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
             
             // Act
             double result = node.ProcessInputs(inputs);
@@ -84,7 +84,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] bias = { 0.0 };
             
             // Act
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Tanh);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Tanh);
             
             // Assert
             Assert.Equal(ActivationFunctions.Tanh, node.ActivationFunction);
@@ -101,7 +101,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] bias = { 0.0 };
             
             // Act
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.ReLU);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.ReLU);
             
             // Assert
             Assert.Equal(ActivationFunctions.ReLU, node.ActivationFunction);
@@ -121,7 +121,7 @@ namespace SimpleNeuralNetwork.Tests
             Func<double, double> leakyReLUFunc = x => ActivationFunctions.LeakyReLU(x);
             
             // Act
-            var node = new Node(layer, 0, weights, bias, leakyReLUFunc);
+            var node = new Neuron(layer, 0, weights, bias, leakyReLUFunc);
             
             // Assert
             Assert.Equal(leakyReLUFunc, node.ActivationFunction);
@@ -136,7 +136,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 0.5, -0.3 };
             double[] bias = { 0.2 };
             double[] inputs = { 1.0, 2.0 };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
             
             // Act
             double result = node.ProcessInputs(inputs);
@@ -155,7 +155,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 0.5, -0.3 };
             double[] bias = { 0.0 };
             double[] inputs = { 2.0, 3.0 };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
             node.ProcessInputs(inputs);
             
             // Act
@@ -175,7 +175,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 0.5 };
             double[] bias = { 0.2 };
             double[] inputs = { 1.0 };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
             node.ProcessInputs(inputs);
             
             // Act
@@ -193,7 +193,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 0.5, -0.3 };
             double[] bias = { 0.0 };
             double[] inputs = { 2.0, 3.0 };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
             node.ProcessInputs(inputs);
             
             var nodeSteps = new Gradients(2);
@@ -218,7 +218,7 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 1.0 };
             double[] bias = { 0.0 };
             double[] inputs = { input };
-            var node = new Node(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
+            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
             
             // Act
             double output = node.ProcessInputs(inputs);

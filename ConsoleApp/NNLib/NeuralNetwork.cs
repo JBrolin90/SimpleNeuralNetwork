@@ -23,7 +23,7 @@ public class NeuralNetwork : INeuralNetwork
     public Func<double, double>[] ActivationFunctions { get; set; }
     #endregion
     #region Constructors
-    public NeuralNetwork(ILayerFactory LayerFactory, INodeFactory NodeFactory,
+    public NeuralNetwork(ILayerFactory LayerFactory, INeuronFactory NodeFactory,
                         double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions)
     {
         if (LayerFactory == null) throw new ArgumentNullException(nameof(LayerFactory), "LayerFactory cannot be null");
