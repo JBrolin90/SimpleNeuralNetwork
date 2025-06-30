@@ -80,7 +80,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
             var b = Biases[0][0][0];
             Console.WriteLine($"o:{observed[i][0]}, i:{trainingData[i][0]}, w{w}, b{b}, XY{node.Sum} L{lossPart[0]}, dL{dLossPart[0]}, wGrd{wGrd}, bGrd{bGrd} ");
         }
-        UpdateWeightsAndBiases();
+        UpdateWeightsAndBiases(trainingData.Length);
 
         return loss;
     }
@@ -105,8 +105,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
             }
             PropagateBackwards(dLossPart);
         }
-        // UpdateWeightsAndBiases(trainingData.Length);
-        UpdateWeightsAndBiases();
+        UpdateWeightsAndBiases(trainingData.Length);
 
         return loss;
     }
@@ -262,7 +261,7 @@ public class NeuralNetworkTrainer : NeuralNetwork
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
                     double wGradient = Gradients[j1][k1].WeightGradient[l];
-                    Weigths[j1][k1][l] -= wGradient * LearningRate;
+                    Weigths[j1][k1][l] -= wGradient * LearningRate / divisor; 
                 }
                 double bGradient = Gradients[j1][k1].BiasGradient;
                 Biases[j1][k1][0] -= bGradient * LearningRate /divisor;

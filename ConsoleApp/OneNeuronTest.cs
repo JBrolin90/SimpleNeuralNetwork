@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Globalization;
 using System.Security.AccessControl;
 using BackPropagation.NNLib;
@@ -29,15 +30,33 @@ public class OneNeuronTest
         double w=0, b=0, diff, loss, dLoss;
         double x, y, wGrad, bGrad, wGradSum, bGradSum;
 
+        double ProcessInput(double i)
+        {
+            return x = i * w + b;
+        }
+
+        double Activate(double x)
+        {
+            return x;
+        }
+
+        double Predict(double i)
+        {
+            x = ProcessInput(i);
+            return y = Activate(x);
+        }
+        double ActivateDerivative(double x)
+        {
+            return 1;
+        }
         void VerifyPrediction(double i, double observed)
         {
-            x = i * w +b;
-            y = x;
+            y = Predict(i);
             diff = y - observed;
             loss = diff * diff;
             dLoss = 2 * diff;
-            wGradSum += wGrad = dLoss * i;
-            bGradSum += bGrad = dLoss;
+            wGradSum += wGrad = dLoss * ActivateDerivative(x) * i;
+            bGradSum += bGrad = dLoss * ActivateDerivative(x);
 
             Console.WriteLine($"o:{observed}, i:{i}, w{w}, b{b}, XY{y}, L{loss}, dL{dLoss}, wGrd{wGrad}, bGrd{bGrad}, wGS{wGradSum}, bGS{bGradSum}");
         }
@@ -49,8 +68,8 @@ public class OneNeuronTest
             {
                 VerifyPrediction(samples[i], observed[i]);
             }
-            w -= wGradSum*0.1;
-            b -= bGradSum*0.1;
+            w -= wGradSum*0.1 / samples.Length;
+            b -= bGradSum*0.1 / samples.Length;
         }
 
     
@@ -85,20 +104,13 @@ public class OneNeuronTest
 
         Train();
 
-        static void print(double val)
-        {
-            Console.WriteLine($"Weight: {val}");
-        }
-        NetworkCreator.ActOn3dArr(network!.Weigths, print);
-        Console.WriteLine();
-        NetworkCreator.ActOn3dArr(network!.Biases, print);
 
         Console.WriteLine("After training:");
         var prediction = network!.Predict([0]);
         Console.WriteLine($"0 => {prediction[0]}");
-        prediction = network.Predict([0.5]);
-        Console.WriteLine($"0.5 => {prediction[0]}");
-        prediction = network.Predict([1]);
-        Console.WriteLine($"1 => {prediction[0]}");
+        prediction = network.Predict([10]);
+        Console.WriteLine($"10 => {prediction[0]}");
+        prediction = network.Predict([-5]);
+        Console.WriteLine($"-5 => {prediction[0]}");
     }
 }
