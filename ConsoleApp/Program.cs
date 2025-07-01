@@ -13,7 +13,7 @@ internal class Program
         //new MinimalTest().DoIt();
         //new OneNeuronTest().DoIt();
         // new AdderTest().DoIt();
-        //new Linear2LayersTest().DoIt();
+        new Linear2LayersTest().DoIt();
         new TwoLayerAdder().DoIt();
     }   
 }
