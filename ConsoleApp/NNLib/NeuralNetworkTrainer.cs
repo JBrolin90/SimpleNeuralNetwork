@@ -125,7 +125,7 @@ public class NeuralNetworkTrainer
         {
             neuronErrors[i] = new double[network.Layers[i].Neurons.Length];
         }
-
+        // Console.Write("Gradients: ");
         // Start from output layer and work backwards
         for (int layerIndex = network.Layers.Length - 1; layerIndex >= 0; layerIndex--)
         {
@@ -158,6 +158,7 @@ public class NeuralNetworkTrainer
                 }
             }
         }
+        // Console.WriteLine();
     }
 
     private void CalculateNodeGradients(INeuron neuron, double error, int layerIndex, int nodeIndex)
@@ -173,7 +174,8 @@ public class NeuralNetworkTrainer
             double input = (weightIndex < layerInputs.Length) ? layerInputs[weightIndex] : 0;
             double gradient = error * activationDerivative * input;
             Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex] += gradient;
-        //    Console.WriteLine($"Weight Gradient [l{layerIndex}, n{nodeIndex}, w{weightIndex}] = isol: {gradient} Sum: {Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex]}");
+            //Console.WriteLine($"Weight Gradient [l{layerIndex}, n{nodeIndex}, w{weightIndex}] = isol: {gradient} Sum: {Gradients[layerIndex][nodeIndex].WeightGradient[weightIndex]}");
+            // Console.Write($"[{layerIndex},{neuron.Index},{weightIndex}]: {gradient}, ");
         }
 
         // Calculate bias gradient

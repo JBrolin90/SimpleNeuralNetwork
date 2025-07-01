@@ -21,6 +21,7 @@ public class NeuronFactory : INeuronFactory
 
 public interface INeuron
 {
+    public int Index { get; set; }
     double[] Weights { get; set; }
     double[] Bias { get; set; }
     public double Sum { get; set; }
