@@ -92,7 +92,7 @@ public class NeuralNetworkTrainer
             Gradients[i] = new Gradients[layer.Neurons.Length];
             for (int j = 0; j < layer.Neurons.Length; j++)
             {
-                Gradients[i][j] = new Gradients(layer.Neurons[j].Weights.Length);
+                Gradients[i][j] = new Gradients(layer.InputProcessors[j].Weights.Length);
             }
             i++;
         }
@@ -165,11 +165,12 @@ public class NeuralNetworkTrainer
     {
         // Get the layer inputs for gradient calculation
         var layer = network.Layers[layerIndex];
+        var proc = layer.InputProcessors[nodeIndex];
         double[] layerInputs = layer.Inputs ?? [];
 
         // Calculate weight gradients
-        double activationDerivative = neuron.ActivationDerivative(neuron.Sum);
-        for (int weightIndex = 0; weightIndex < neuron.Weights.Length; weightIndex++)
+        double activationDerivative = neuron.ActivationDerivative(proc.Y);
+        for (int weightIndex = 0; weightIndex < proc.Weights.Length; weightIndex++)
         {
             double input = (weightIndex < layerInputs.Length) ? layerInputs[weightIndex] : 0;
             double gradient = error * activationDerivative * input;
@@ -179,7 +180,7 @@ public class NeuralNetworkTrainer
         }
 
         // Calculate bias gradient
-        double biasGradient = error * neuron.ActivationDerivative(neuron.Sum) * 1;
+        double biasGradient = error * neuron.ActivationDerivative(proc.Y) * 1;
         Gradients[layerIndex][nodeIndex].BiasGradient += biasGradient;
         //Console.WriteLine($"Bias Gradient [l{layerIndex}, n{nodeIndex}] = isol: {biasGradient} Sum {Gradients[layerIndex][nodeIndex].BiasGradient}");
     }
@@ -192,14 +193,15 @@ public class NeuralNetworkTrainer
         // Sum errors from all nodes in next layer that this node connects to
         for (int nextNodeIndex = 0; nextNodeIndex < nextLayer.Neurons.Length; nextNodeIndex++)
         {
-            var nextNode = nextLayer.Neurons[nextNodeIndex];
+            var nextProc = nextLayer.InputProcessors[nextNodeIndex];
+            var nextNeuron = nextLayer.Neurons[nextNodeIndex];
 
             // Get the weight connecting current node to next node
             // dP/dY
-            double weight = nextNode.Weights[currentNodeIndex];
+            double weight = nextProc.Weights[currentNodeIndex];
 
             // dY/dX
-            double activationDerivative = nextNode.ActivationDerivative(nextNode.Sum);
+            double activationDerivative = nextNeuron.Derivative(nextProc.Y);
 
             // Use the ALREADY CALCULATED error from next layer (no recursion!)
             double nextNodeError = neuronErrors[currentLayerIndex + 1][nextNodeIndex];

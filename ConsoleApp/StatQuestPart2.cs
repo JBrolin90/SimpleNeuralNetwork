@@ -24,7 +24,7 @@ public class StatQuestPart2
 
     public StatQuestPart2()
     {
-        NeuralNetwork nn1 = new(new LayerFactory(), new NeuronFactory(),
+        NeuralNetwork nn1 = new(new LayerFactory(), new NeuronFactory(), new InputProcessorFactory(),
     weights, biases, ys, activationFunctions);
         NeuralNetworkTrainer trainer = new(nn1, 0.1);
 

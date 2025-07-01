@@ -87,7 +87,7 @@ public class NetworkCreator
 
     public INeuralNetwork CreateNetwork()
     {
-        NeuralNetwork n = new(new LayerFactory(), new NeuronFactory(),
+        NeuralNetwork n = new(new LayerFactory(), new NeuronFactory(), new InputProcessorFactory(),
                         Weights, Biases, Ys,
                         ActivationFunctions);
         return n;

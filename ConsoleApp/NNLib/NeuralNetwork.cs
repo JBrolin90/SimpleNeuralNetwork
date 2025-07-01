@@ -23,11 +23,13 @@ public class NeuralNetwork : INeuralNetwork
     public Func<double, double>[] ActivationFunctions { get; set; }
     #endregion
     #region Constructors
-    public NeuralNetwork(ILayerFactory LayerFactory, INeuronFactory NodeFactory,
-                        double[][][] weights, double[][][] biases, double[][] ys, Func<double, double>[] activationFunctions)
+    public NeuralNetwork(ILayerFactory LayerFactory, INeuronFactory NeuronFactory,
+                        IInputProcessorFactory inputProcessorFactory,
+                        double[][][] weights, double[][][] biases, double[][] ys,
+                        Func<double, double>[] activationFunctions)
     {
         if (LayerFactory == null) throw new ArgumentNullException(nameof(LayerFactory), "LayerFactory cannot be null");
-        if (NodeFactory == null) throw new ArgumentNullException(nameof(NodeFactory), "NodeFactory cannot be null");
+        if (NeuronFactory == null) throw new ArgumentNullException(nameof(NeuronFactory), "NodeFactory cannot be null");
         Ys = ys;
         Weigths = weights;
         Biases = biases;
@@ -36,10 +38,8 @@ public class NeuralNetwork : INeuralNetwork
 
         for (int i = 0; i < Layers.Length; i++)
         {
-            var layerType = i == 0 ? LayerType.Input : i == Layers.Length - 1 ? LayerType.Output : LayerType.Hidden;
-                layerType = i == Layers.Length - 1 ? LayerType.Output : LayerType.Hidden;
-            var expectedOutputs = layerType == LayerType.Output ? ys[i] : null;
-            Layers[i] = LayerFactory.Create(i, NodeFactory, weights[i], biases[i], activationFunctions[i], layerType, expectedOutputs);
+            Layers[i] = LayerFactory.Create(i, NeuronFactory, inputProcessorFactory,
+                weights[i], biases[i], activationFunctions[i]);
             if (i > 0)
             {
                 Layers[i].PreviousLayer = Layers[i - 1];
