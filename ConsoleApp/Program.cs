@@ -12,7 +12,7 @@ internal class Program
         //new AlgebraTest().DoIt();
         //new MinimalTest().DoIt();
         //new OneNeuronTest().DoIt();
-        // new AdderTest().DoIt();
+        new AdderTest().DoIt();
         new Linear2LayersTest().DoIt();
         new TwoLayerAdder().DoIt();
     }   
