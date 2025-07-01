@@ -26,7 +26,7 @@ public class AdderTest
         Func<double, double>[] af = [ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(2, [1], af);
         network = networkCreator.CreateNetwork();
-        trainer = new(network, 0.01);
+        trainer = new(network, learningRate);
     }
 
     internal class EpochVerifier
