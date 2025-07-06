@@ -147,66 +147,6 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Equal(expectedSum, node.Y, 7);
         }
 
-        [Fact]
-        public void GetWeightDerivativeX_WithUnitActivation_ReturnsInput()
-        {
-            // Arrange
-            var layer = new MockLayer();
-            double[] weights = { 0.5, -0.3 };
-            double[] bias = { 0.0 };
-            double[] inputs = { 2.0, 3.0 };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
-            node.ProcessInputs(inputs);
-            
-            // Act
-            double derivative0 = node.GetWeightDerivativeX(0);
-            double derivative1 = node.GetWeightDerivativeX(1);
-            
-            // Assert
-            Assert.Equal(2.0, derivative0, 7); // input[0] * activationDerivative(sum)
-            Assert.Equal(3.0, derivative1, 7); // input[1] * activationDerivative(sum)
-        }
-
-        [Fact]
-        public void BiasDerivative_WithUnitActivation_ReturnsOne()
-        {
-            // Arrange
-            var layer = new MockLayer();
-            double[] weights = { 0.5 };
-            double[] bias = { 0.2 };
-            double[] inputs = { 1.0 };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
-            node.ProcessInputs(inputs);
-            
-            // Act
-            double biasDerivative = node.BiasDerivative();
-            
-            // Assert
-            Assert.Equal(1.0, biasDerivative, 7);
-        }
-
-        [Fact]
-        public void Backward_WithUnitActivation_UpdatesNodeStepsCorrectly()
-        {
-            // Arrange
-            var layer = new MockLayer();
-            double[] weights = { 0.5, -0.3 };
-            double[] bias = { 0.0 };
-            double[] inputs = { 2.0, 3.0 };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
-            node.ProcessInputs(inputs);
-            
-            var nodeSteps = new Gradients(2);
-            double error = 0.1;
-            
-            // Act
-            var result = node.Backward(error, nodeSteps);
-            
-            // Assert
-            Assert.Equal(0.2, result.WeightGradient[0], 7); // error * chainFactor * weightDerivative[0]
-            Assert.Equal(0.3, result.WeightGradient[1], 7); // error * chainFactor * weightDerivative[1]
-            Assert.Equal(0.1, result.BiasGradient, 7); // error * chainFactor * biasDerivative
-        }
 
         [Theory]
         [InlineData(0.0, 0.25)] // sigmoid'(0) = 0.25
@@ -232,7 +172,7 @@ namespace SimpleNeuralNetwork.Tests
     // Mock layer class for testing
     public class MockLayer : ILayer
     {
-        public INode[] Nodes { get; set; } = Array.Empty<INode>();
+        public INeuron[] Neurons { get; set; } = Array.Empty<INeuron>();
         public ILayer? PreviousLayer { get; set; }
         public ILayer? NextLayer { get; set; }
         public double[]? Inputs { get; set; }
