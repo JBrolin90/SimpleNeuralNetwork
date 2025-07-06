@@ -6,12 +6,12 @@ namespace BackPropagation.NNLib;
 #region Factory
 public interface INeuronFactory
 {
-    INeuron Create(Layer layer, int index, Func<double, double> activationFunction);
+    INeuron Create(ILayer layer, int index, Func<double, double> activationFunction);
 }
 
 public class NeuronFactory : INeuronFactory
 {
-    public INeuron Create(Layer layer, int index, Func<double, double> activationFunction)
+    public INeuron Create(ILayer layer, int index, Func<double, double> activationFunction)
     {
         return new Neuron(layer, index, activationFunction);
     }
@@ -41,7 +41,7 @@ public class Neuron : INeuron
     #region Constructors
     public Neuron(ILayer layer, int index, Func<double, double> activationFunction)
     {
-        Layer = layer;
+        Layer = layer ?? throw new ArgumentNullException(nameof(layer));
         Index = index;
         ActivationFunction = activationFunction ?? ActivationFunctions.SoftPlus;
         if (ActivationFunction == ActivationFunctions.SoftPlus)
@@ -55,6 +55,19 @@ public class Neuron : INeuron
         else if (ActivationFunction == ActivationFunctions.Unit)
         {
             ActivationDerivative = ActivationFunctions.UnitDerivative;
+        }
+        else if (ActivationFunction == ActivationFunctions.Tanh)
+        {
+            ActivationDerivative = ActivationFunctions.TanhDerivative;
+        }
+        else if (ActivationFunction == ActivationFunctions.ReLU)
+        {
+            ActivationDerivative = ActivationFunctions.ReLUDerivative;
+        }
+        else
+        {
+            // For other activation functions, use the default SoftPlus derivative
+            ActivationDerivative = ActivationFunctions.SoftPlusDerivative;
         }
     }
     #endregion
