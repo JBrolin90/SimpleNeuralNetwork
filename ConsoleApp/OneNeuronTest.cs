@@ -13,6 +13,13 @@ public class OneNeuronTest
     INeuralNetwork? network;
     NeuralNetworkTrainer? trainer;
 
+    public INeuralNetwork GetNetwork()
+    {
+        if (network == null)
+            throw new InvalidOperationException("Network has not been created. Call CreateNetwork() first.");
+        return network;
+    }
+
     public double[] CreateTrainingData()
     {
         return samples = [0, 1];
@@ -99,6 +106,11 @@ public class OneNeuronTest
         NetworkCreator.ApplyOn3dArr(network!.Weigths, FixedWeight);
         return network.Weigths;
     }
+    public void Execute()
+    {
+        DoIt();
+    }
+
     public void DoIt()
     {
         CreateNetwork();
