@@ -36,7 +36,7 @@ public class Normalizer
 
 public class Multiplier
 {
-    const int epochs = 400000;
+    const int epochs = 240000;
     const double learningRate = 0.35;
 
     INeuralNetwork? network = null;
@@ -52,7 +52,7 @@ public class Multiplier
     {
         Func<double, double>[] af = [ActivationFunctions.SoftPlus, ActivationFunctions.SoftPlus, ActivationFunctions.Unit];
         var networkCreator = new NetworkCreator(2, [4, 4, 1], af);
-        networkCreator.RandomizeWeights(-1, 1);
+        networkCreator.RandomizeWeights(-0.3, 0.3);
         network = networkCreator.CreateNetwork();
         trainer = new(network, learningRate);
     }
@@ -61,28 +61,43 @@ public class Multiplier
     {
         Console.WriteLine($"{op1} x {op2} = {ans}");
     }
+    void Log(string s, bool newLine = true)
+    {
+        Console.Write(s);
+        if (newLine) Console.WriteLine();
+
+    }
     public void CreateTrainingData()
     {
-        const int sampleCount = 500;
-        const double from = 0;
+        const int sampleCount = 250;
+        const double from = -1;
         const double to = 1;
         const double range = to - from;
         samples = new double[sampleCount][];
         observed = new double[samples.Length][];
+        double maxOp1 = 0, maxOp2 = 0;
+        double minOp1 = 0, minOp2 = 0;
 
-        for (int i = 0; i < sampleCount; i++)
+        samples[0] = [-1, -1]; samples[1] = [-1, 1]; samples[2] = [1, -1]; samples[3] = [1, 1];
+        observed[0] = [1]; observed[1] = [-1]; observed[2] = [-1]; observed[3] = [1];
+        for (int i = 4; i < sampleCount; i++)
         {
-            double op1 = new Random().NextDouble() * range;
-            double op2 = new Random().NextDouble() * range;
+            double op1 = new Random().NextDouble() * range + from;
+            double op2 = new Random().NextDouble() * range + from;
             // Log(op1, op2, op1 * op2);
+            minOp1 = Math.Min(-1, op1);
+            minOp2 = Math.Min(-1, op2);
+            maxOp1 = Math.Max(1, op1);
+            maxOp2 = Math.Max(1, op1);
 
 
             op1 = normalizer.Normalize(op1);
             op2 = normalizer.Normalize(op2);
             observed[i] = [op1 * op2];
             samples[i] = [op1, op2];
-//            Log(normalizer.Denormalize(op1), normalizer.Denormalize(op2), normalizer.Denormalize(op1 * op2));
+            //            Log(normalizer.Denormalize(op1), normalizer.Denormalize(op2), normalizer.Denormalize(op1 * op2));
         }
+        Log($"Actual training range: [{minOp1},{minOp2}] x [{maxOp1}, {maxOp2}]");
 
     }
     public void Train()
@@ -92,7 +107,7 @@ public class Multiplier
             double[] loss = trainer!.TrainOneEpoch(samples, observed);
             if (i % (epochs / 20) == 0)
             {
-                Console.WriteLine($"Epoch {i} loss: {loss[0]}");
+                Console.WriteLine($"Epoch {i} loss (MSE): {loss[0]}");
             }
         }
     }
@@ -102,8 +117,17 @@ public class Multiplier
         double aa = normalizer.Normalize(a);
         double bb = normalizer.Normalize(b);
         double r = network!.Predict([aa, bb])[0];
-        Console.WriteLine($"{a}x{b} = {r}");
         return normalizer.Denormalize(r);
+    }
+
+    void Multiply4Quadrants(double a, double b)
+    {
+        double q0 = Multiply(a, b);
+        double q1 = Multiply(-a, b);
+        double q2 = Multiply(a, -b);
+        double q3 = Multiply(-a, -b);
+        Log($"(+-{a})*(+-{b}) = [q0:{q0}, q1{q1}, q2{q2}, q3{q3}]");
+
     }
     public void DoIt()
     {
@@ -113,10 +137,11 @@ public class Multiplier
 
 
         Console.WriteLine("After training:");
-        var prediction = Multiply(0.5, 0.5);
-        prediction = Multiply(1, 1);
-        prediction = Multiply(0.5, 1);
-        prediction = Multiply(1.5, 1);
-        Multiply(2, 2);
+        Multiply4Quadrants(0.5, 0.5);
+        Multiply4Quadrants(1, 1);
+
+        Multiply4Quadrants(0.1, 0.2);
+        Multiply4Quadrants(0.2, 0.1);
+        Multiply4Quadrants(0, 1);
     }
 }
