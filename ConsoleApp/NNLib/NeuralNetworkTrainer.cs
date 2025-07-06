@@ -70,7 +70,10 @@ public class NeuralNetworkTrainer
             // Console.WriteLine($"o:{observed[i][0]}, i:{trainingData[i][0]}, w{w}, b{b}, XY{node.Sum} L{lossPart[0]}, dL{dLossPart[0]}, wGrd{wGrd}, bGrd{bGrd} ");
         }
         UpdateWeightsAndBiases(trainingData.Length);
-
+        for (int i = 0; i < loss.Length; i++)
+        {
+            loss[i] /= trainingData.Length;
+        }
         return loss;
     }
     public double[] TrainOneEpoch(Sample[] trainingData)
