@@ -97,7 +97,10 @@ public class Layer : ILayer
             double x = InputProcessors[i].ProcessInputs(Inputs);
             Ys[i] = Neurons[i].Activate(x);
         }
-        return Ys;
+        // Return a copy of the Ys array to avoid reference issues
+        double[] result = new double[Ys.Length];
+        Array.Copy(Ys, result, Ys.Length);
+        return result;
     }
     #endregion
 }
