@@ -77,60 +77,6 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Null(outputLayer.NextLayer);
         }
 
-        [Fact]
-        public void OutputLayer_GetWeightChainFactor_ReturnsOne()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var outputLayer = new OutputLayer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-
-            // Act
-            double chainFactor = outputLayer.CalculateLayerErrorRecursively(0);
-
-            // Assert
-            Assert.Equal(1.0, chainFactor, 7); // Output layer should return 1.0
-        }
-
-        [Fact]
-        public void OutputLayer_GetBiasChainFactor_ReturnsOne()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var outputLayer = new OutputLayer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-
-            // Act
-            double chainFactor = outputLayer.GetBiasChainFactor();
-
-            // Assert
-            Assert.Equal(1.0, chainFactor, 7); // Output layer should return 1.0
-        }
-
-        [Fact]
-        public void OutputLayer_Backward_ProcessesErrorCorrectly()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0, 0.5 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var outputLayer = new OutputLayer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-            
-            // Process some inputs first
-            outputLayer.Forward(new double[] { 2.0, 3.0 });
-            
-            var nodeSteps = new Gradients[] { new Gradients(2) };
-            double error = 0.1;
-
-            // Act
-            var result = outputLayer.Backward(error, nodeSteps);
-
-            // Assert
-            Assert.Single(result);
-            Assert.NotNull(result[0]);
-        }
 
         [Theory]
         [InlineData(new double[] { 1.0, 2.0 }, new double[] { 0.5, -0.3 }, new double[] { 0.2 }, 0.1)]

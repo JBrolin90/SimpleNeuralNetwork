@@ -111,9 +111,7 @@ public class AdderTest
     public void DoIt()
     {
         CreateNetwork();
-
         CreateTrainingData();
-
         Train();
 
 

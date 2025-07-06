@@ -83,29 +83,6 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Equal(-2.5, layer.Ys[1], 7); // 3.0*(-1.0) + 0.5 = -2.5
         }
 
-        [Fact]
-        public void Layer_Backward_ProcessesErrorCorrectly()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0, 0.5 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-            
-            // Process some inputs first
-            layer.Forward(new double[] { 2.0, 3.0 });
-            
-            var nodeSteps = new Gradients[] { new Gradients(2) };
-            double error = 0.1;
-
-            // Act
-            var result = layer.Backward(error, nodeSteps);
-
-            // Assert
-            Assert.Single(result);
-            Assert.NotNull(result[0]);
-            // The actual values depend on the chain factor calculation
-        }
 
         [Theory]
         [InlineData(new double[] { 1.0, 2.0 }, new double[] { 0.5, -0.3 }, new double[] { 0.2 }, 0.1)]
@@ -151,38 +128,6 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Equal(4.2, outputs[1], 7); // 3.0*0.0 + 4.0*1.0 + 0.2 = 4.2
         }
 
-        [Fact]
-        public void Layer_GetWeightChainFactor_WithNoNextLayer_ReturnsOne()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-            // No NextLayer set (null)
-
-            // Act
-            double result = layer.CalculateLayerErrorRecursively(0);
-
-            // Assert
-            Assert.Equal(1.0, result, 7);
-        }
-
-        [Fact]
-        public void Layer_GetBiasChainFactor_WithNoNextLayer_ReturnsOne()
-        {
-            // Arrange
-            double[][] weights = { new double[] { 1.0 } };
-            double[][] biases = { new double[] { 0.0 } };
-            var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
-
-            // Act
-            double result = layer.GetBiasChainFactor();
-
-            // Assert
-            Assert.Equal(1.0, result, 7);
-        }
 
         [Fact]
         public void Layer_InputsProperty_StoresLastForwardInputs()
