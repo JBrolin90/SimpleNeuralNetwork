@@ -16,9 +16,10 @@ namespace SimpleNeuralNetwork.Tests
             double[][] weights = { new double[] { 0.5, -0.3 }, new double[] { 0.8, 0.2 } };
             double[][] biases = { new double[] { 0.1 }, new double[] { -0.2 } };
             var nodeFactory = new NeuronFactory();
+            var inputProcessorFactory = new InputProcessorFactory();
 
             // Act
-            var layer = new Layer(index, nodeFactory, weights, biases, ActivationFunctions.Sigmoid);
+            var layer = new Layer(index, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Sigmoid);
 
             // Assert
             Assert.Equal(index, layer.Index);
@@ -34,7 +35,8 @@ namespace SimpleNeuralNetwork.Tests
             double[][] weights = { new double[] { 1.0, 0.0 }, new double[] { 0.0, 1.0 } };
             double[][] biases = { new double[] { 0.0 }, new double[] { 0.0 } };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 2.0, 3.0 };
 
             // Act
@@ -53,7 +55,8 @@ namespace SimpleNeuralNetwork.Tests
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Sigmoid);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Sigmoid);
             double[] inputs = { 0.0 };
 
             // Act
@@ -71,7 +74,8 @@ namespace SimpleNeuralNetwork.Tests
             double[][] weights = { new double[] { 2.0 }, new double[] { -1.0 } };
             double[][] biases = { new double[] { 1.0 }, new double[] { 0.5 } };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 3.0 };
 
             // Act
@@ -93,7 +97,8 @@ namespace SimpleNeuralNetwork.Tests
             double[][] layerWeights = { weights };
             double[][] layerBiases = { bias };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, layerWeights, layerBiases, ActivationFunctions.Unit);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, layerWeights, layerBiases, ActivationFunctions.Unit);
 
             // Act
             double[] outputs = layer.Forward(inputs);
@@ -116,7 +121,8 @@ namespace SimpleNeuralNetwork.Tests
                 new double[] { 0.2 } 
             };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 3.0, 4.0 };
 
             // Act
@@ -136,7 +142,8 @@ namespace SimpleNeuralNetwork.Tests
             double[][] weights = { new double[] { 1.0 } };
             double[][] biases = { new double[] { 0.0 } };
             var nodeFactory = new NeuronFactory();
-            var layer = new Layer(0, nodeFactory, weights, biases, ActivationFunctions.Unit);
+            var inputProcessorFactory = new InputProcessorFactory();
+            var layer = new Layer(0, nodeFactory, inputProcessorFactory, weights, biases, ActivationFunctions.Unit);
             double[] inputs = { 5.0 };
 
             // Act

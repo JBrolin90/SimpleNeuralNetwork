@@ -4,7 +4,7 @@ using BackPropagation.NNLib;
 
 namespace SimpleNeuralNetwork.Tests
 {
-    public class NodeTests
+    public class NeuronTests
     {
         private const double Tolerance = 1e-7;
 
@@ -18,13 +18,11 @@ namespace SimpleNeuralNetwork.Tests
             double[] bias = { 0.2 };
             
             // Act
-            var node = new Neuron(layer, index, weights, bias, ActivationFunctions.Sigmoid);
+            var node = new Neuron(layer, index, ActivationFunctions.Sigmoid);
             
             // Assert
             Assert.Equal(layer, node.Layer);
             Assert.Equal(index, node.Index);
-            Assert.Equal(weights, node.Weights);
-            Assert.Equal(bias, node.Bias);
             Assert.Equal(ActivationFunctions.Sigmoid, node.ActivationFunction);
             Assert.Equal(ActivationFunctions.SigmoidDerivative, node.ActivationDerivative);
         }
@@ -33,11 +31,9 @@ namespace SimpleNeuralNetwork.Tests
         public void Node_Constructor_WithNullLayer_ThrowsException()
         {
             // Arrange
-            double[] weights = { 0.5 };
-            double[] bias = { 0.2 };
             
             // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new Neuron(null!, 0, weights, bias));
+            Assert.Throws<ArgumentNullException>(() => new Neuron(null!, 0, ActivationFunctions.Unit));
         }
 
         [Theory]
@@ -48,13 +44,13 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var inputProcessor = new InputProcessor(layer, 0, weights, bias);
             
             // Act
-            node.ProcessInputs(inputs);
+            inputProcessor.ProcessInputs(inputs);
             
             // Assert
-            Assert.Equal(expectedSum, node.Sum, 7);
+            Assert.Equal(expectedSum, inputProcessor.Y, 7);
         }
 
         [Fact]
@@ -65,14 +61,14 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 1.0 };
             double[] bias = { 0.0 };
             double[] inputs = { 0.0 };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
+            var inputProcessor = new InputProcessor(layer, 0, weights, bias);
             
             // Act
-            double result = node.ProcessInputs(inputs);
+            double result = inputProcessor.ProcessInputs(inputs);
             
             // Assert
-            Assert.Equal(0.5, result, 7); // sigmoid(0) = 0.5
-            Assert.Equal(0.5, node.Y, 7);
+            Assert.Equal(0.5, result, 7);
+            Assert.Equal(0.5, inputProcessor.Y, 7);
         }
 
         [Fact]
@@ -80,11 +76,9 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            double[] weights = { 1.0 };
-            double[] bias = { 0.0 };
             
             // Act
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Tanh);
+            var node = new Neuron(layer, 0, ActivationFunctions.Tanh);
             
             // Assert
             Assert.Equal(ActivationFunctions.Tanh, node.ActivationFunction);
@@ -97,11 +91,9 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            double[] weights = { 1.0 };
-            double[] bias = { 0.0 };
             
             // Act
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.ReLU);
+            var node = new Neuron(layer, 0, ActivationFunctions.ReLU);
             
             // Assert
             Assert.Equal(ActivationFunctions.ReLU, node.ActivationFunction);
@@ -114,14 +106,12 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            double[] weights = { 1.0 };
-            double[] bias = { 0.0 };
             
             // Create a wrapper function for LeakyReLU with default alpha
             Func<double, double> leakyReLUFunc = x => ActivationFunctions.LeakyReLU(x);
             
             // Act
-            var node = new Neuron(layer, 0, weights, bias, leakyReLUFunc);
+            var node = new Neuron(layer, 0, leakyReLUFunc);
             
             // Assert
             Assert.Equal(leakyReLUFunc, node.ActivationFunction);
@@ -136,15 +126,15 @@ namespace SimpleNeuralNetwork.Tests
             double[] weights = { 0.5, -0.3 };
             double[] bias = { 0.2 };
             double[] inputs = { 1.0, 2.0 };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Unit);
+            var inputProcessor = new InputProcessor(layer, 0, weights, bias);
             
             // Act
-            double result = node.ProcessInputs(inputs);
+            double result = inputProcessor.ProcessInputs(inputs);
             
             // Assert
             double expectedSum = 1.0 * 0.5 + 2.0 * (-0.3) + 0.2; // -0.4
             Assert.Equal(expectedSum, result, 7);
-            Assert.Equal(expectedSum, node.Y, 7);
+            Assert.Equal(expectedSum, inputProcessor.Y, 7);
         }
 
 
@@ -155,13 +145,11 @@ namespace SimpleNeuralNetwork.Tests
         {
             // Arrange
             var layer = new MockLayer();
-            double[] weights = { 1.0 };
-            double[] bias = { 0.0 };
             double[] inputs = { input };
-            var node = new Neuron(layer, 0, weights, bias, ActivationFunctions.Sigmoid);
+            var node = new Neuron(layer, 0, ActivationFunctions.Sigmoid);
             
             // Act
-            double output = node.ProcessInputs(inputs);
+            double output = node.Activate(input);
             double derivative = node.ActivationDerivative(output);
             
             // Assert
@@ -177,6 +165,7 @@ namespace SimpleNeuralNetwork.Tests
         public ILayer? NextLayer { get; set; }
         public double[]? Inputs { get; set; }
         public int Index { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public IInputProcessor[] InputProcessors { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public double[] Forward(double[] inputs)
         {
