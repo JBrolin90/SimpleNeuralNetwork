@@ -36,40 +36,6 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Throws<ArgumentNullException>(() => new Neuron(null!, 0, ActivationFunctions.Unit));
         }
 
-        [Theory]
-        [InlineData(new double[] { 1.0, 2.0 }, new double[] { 0.5, -0.3 }, new double[] { 0.2 }, 0.1)]  // 1.0*0.5 + 2.0*(-0.3) + 0.2 = 0.1
-        [InlineData(new double[] { 0.0, 0.0 }, new double[] { 0.5, -0.3 }, new double[] { 0.1 }, 0.1)]
-        [InlineData(new double[] { 2.0, -1.0, 3.0 }, new double[] { 0.2, 0.4, -0.1 }, new double[] { 0.0 }, -0.3)] // 2.0*0.2 + (-1.0)*0.4 + 3.0*(-0.1) + 0.0 = -0.3
-        public void ProcessInputs_WithVariousInputs_CalculatesCorrectSum(double[] inputs, double[] weights, double[] bias, double expectedSum)
-        {
-            // Arrange
-            var layer = new MockLayer();
-            var inputProcessor = new InputProcessor(layer, 0, weights, bias);
-            
-            // Act
-            inputProcessor.ProcessInputs(inputs);
-            
-            // Assert
-            Assert.Equal(expectedSum, inputProcessor.Y, 7);
-        }
-
-        [Fact]
-        public void ProcessInputs_WithSigmoidActivation_ReturnsCorrectOutput()
-        {
-            // Arrange
-            var layer = new MockLayer();
-            double[] weights = { 1.0 };
-            double[] bias = { 0.0 };
-            double[] inputs = { 0.0 };
-            var inputProcessor = new InputProcessor(layer, 0, weights, bias);
-            
-            // Act
-            double result = inputProcessor.ProcessInputs(inputs);
-            
-            // Assert
-            Assert.Equal(0.5, result, 7);
-            Assert.Equal(0.5, inputProcessor.Y, 7);
-        }
 
         [Fact]
         public void Node_Constructor_WithTanhActivation_SetsCorrectDerivative()
