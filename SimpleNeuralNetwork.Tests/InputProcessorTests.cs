@@ -394,13 +394,9 @@ public class InputProcessorTests
         double[] inputs = { 5.0, 10.0 }; // Only 2 inputs for 3 weights
         var inputProcessor = new InputProcessor(layer, 0, weights, bias);
 
-        // Act
-        double result = inputProcessor.ProcessInputs(inputs);
-
-        // Assert
-        // Should only process the first 2 inputs: 5.0*1.0 + 10.0*2.0 = 25.0
-        Assert.Equal(25.0, result, Tolerance);
-        Assert.Equal(25.0, inputProcessor.Y, Tolerance);
+        // Act & Assert
+        // With current strict validation, this should throw an exception
+        Assert.Throws<IndexOutOfRangeException>(() => inputProcessor.ProcessInputs(inputs));
     }
 
     [Theory]

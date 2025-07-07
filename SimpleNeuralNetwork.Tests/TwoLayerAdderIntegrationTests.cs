@@ -51,13 +51,13 @@ namespace SimpleNeuralNetwork.Tests
             Assert.Equal(2, twoLayerAdderTest.Network.Layers[0].Neurons.Length);
             
             // Second layer should have 1 neuron (output layer)
-            Assert.Equal(1, twoLayerAdderTest.Network.Layers[1].Neurons.Length);
+            Assert.Single(twoLayerAdderTest.Network.Layers[1].Neurons);
 
             // Check weight initialization
             Assert.Equal(2, twoLayerAdderTest.Network.Weigths.Length); // 2 layers
             Assert.Equal(2, twoLayerAdderTest.Network.Weigths[0].Length); // 2 neurons in first layer
             Assert.Equal(2, twoLayerAdderTest.Network.Weigths[0][0].Length); // 2 inputs to first neuron
-            Assert.Equal(1, twoLayerAdderTest.Network.Weigths[1].Length); // 1 neuron in second layer
+            Assert.Single(twoLayerAdderTest.Network.Weigths[1]); // 1 neuron in second layer
             Assert.Equal(2, twoLayerAdderTest.Network.Weigths[1][0].Length); // 2 inputs from first layer
         }
 

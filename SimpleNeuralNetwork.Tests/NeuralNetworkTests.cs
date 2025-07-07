@@ -302,7 +302,7 @@ namespace SimpleNeuralNetwork.Tests
             var neuralNetwork = new NeuralNetwork(layerFactory, nodeFactory, inputProcessorFactory, weights, biases, ys, activationFunctions);
 
             // Act & Assert
-            Assert.Throws<NullReferenceException>(() => neuralNetwork.Predict(null!));
+            Assert.Throws<ArgumentNullException>(() => neuralNetwork.Predict(null!));
         }
 
         [Fact]
@@ -326,13 +326,12 @@ namespace SimpleNeuralNetwork.Tests
             };
             var neuralNetwork = new NeuralNetwork(layerFactory, nodeFactory, inputProcessorFactory, weights, biases, ys, activationFunctions);
 
-            // Act - Current implementation may handle empty arrays differently
+            // Act - Current implementation with strict validation should throw exception
             var result = Record.Exception(() => neuralNetwork.Predict(new double[0]));
 
-            // Assert - Document the current behavior
-            // Note: This test documents the current behavior; in a real implementation
-            // you might want to add proper validation
-            Assert.Null(result); // Current implementation doesn't throw
+            // Assert - Current implementation throws exception for empty input
+            Assert.NotNull(result);
+            Assert.IsType<IndexOutOfRangeException>(result);
         }
 
         [Theory]

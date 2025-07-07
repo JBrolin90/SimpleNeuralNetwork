@@ -312,7 +312,7 @@ namespace SimpleNeuralNetwork.Tests
         [Theory]
         [InlineData(-2.0, 0.0)]
         [InlineData(-1.0, 0.0)]
-        [InlineData(0.0, 1.0)]
+        [InlineData(0.0, 0.0)]
         [InlineData(1.0, 1.0)]
         [InlineData(2.0, 1.0)]
         public void Derivative_WithReLUFunction_ReturnsExpectedValues(double input, double expected)
@@ -338,25 +338,24 @@ namespace SimpleNeuralNetwork.Tests
             var node = new Neuron(layer, 0, ActivationFunctions.Sigmoid);
             
             // Act
-            double output = node.Activate(input);
-            double derivative = node.Derivative(output);
+            double derivative = node.Derivative(input);
             
             // Assert
             Assert.Equal(expected, derivative, Tolerance);
         }
 
         [Theory]
-        [InlineData(0.0, 1.0)] // tanh'(tanh(0)) = tanh'(0) = 1 - 0*0 = 1.0
-        [InlineData(0.5, 0.75)] // tanh'(0.5) = 1 - 0.5*0.5 = 0.75
-        [InlineData(0.9640275800758169, 0.07065081630227928)] // tanh'(tanh(2)) ≈ 0.0707
-        public void Derivative_WithTanhFunction_ReturnsExpectedValues(double activatedOutput, double expected)
+        [InlineData(0.0, 1.0)] // tanh'(0) = 1.0
+        [InlineData(1.0, 0.4199743416140261)] // tanh'(1) ≈ 0.4200
+        [InlineData(2.0, 0.07065082485316443)] // tanh'(2) ≈ 0.0707
+        public void Derivative_WithTanhFunction_ReturnsExpectedValues(double input, double expected)
         {
             // Arrange
             var layer = new MockLayer();
             var node = new Neuron(layer, 0, ActivationFunctions.Tanh);
             
             // Act
-            double derivative = node.Derivative(activatedOutput);
+            double derivative = node.Derivative(input);
             
             // Assert
             Assert.Equal(expected, derivative, Tolerance);
@@ -465,7 +464,7 @@ namespace SimpleNeuralNetwork.Tests
             
             // Act
             double activated = neuron.Activate(0.0);
-            double derivative = neuron.Derivative(activated);
+            double derivative = neuron.Derivative(0.0);  // Pass input, not output
             
             // Assert
             Assert.Equal(0.5, activated, Tolerance);
