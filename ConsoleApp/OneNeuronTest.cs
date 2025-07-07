@@ -12,6 +12,7 @@ public class OneNeuronTest
 
     INeuralNetwork? network;
     NeuralNetworkTrainer? trainer;
+    public bool EnableVerboseOutput { get; set; } = true;
 
     public INeuralNetwork GetNetwork()
     {
@@ -39,6 +40,12 @@ public class OneNeuronTest
     {
         double w=0, b=0, diff, loss, dLoss;
         double x, y, wGrad, bGrad, wGradSum, bGradSum;
+        private readonly bool enableVerboseOutput;
+
+        public EpochVerifier(bool enableVerboseOutput = true)
+        {
+            this.enableVerboseOutput = enableVerboseOutput;
+        }
 
         double ProcessInput(double i)
         {
@@ -68,7 +75,8 @@ public class OneNeuronTest
             wGradSum += wGrad = dLoss * ActivateDerivative(x) * i;
             bGradSum += bGrad = dLoss * ActivateDerivative(x);
 
-            Console.WriteLine($"o:{observed}, i:{i}, w{w}, b{b}, XY{y}, L{loss}, dL{dLoss}, wGrd{wGrad}, bGrd{bGrad}, wGS{wGradSum}, bGS{bGradSum}");
+            if (enableVerboseOutput)
+                Console.WriteLine($"o:{observed}, i:{i}, w{w}, b{b}, XY{y}, L{loss}, dL{dLoss}, wGrd{wGrad}, bGrd{bGrad}, wGS{wGradSum}, bGS{bGradSum}");
         }
 
         internal void VerifyEpoch(double[] samples, double[] observed)
@@ -87,15 +95,18 @@ public class OneNeuronTest
 
     public void Train()
     {
-        EpochVerifier epochVerifier = new();
+        EpochVerifier epochVerifier = new(EnableVerboseOutput);
         for (int i = 0; i < epochs; i++)
         {
             double[] observed = [0.3, 0.6];
-            Console.WriteLine($"Epoch: {i}");
+            if (EnableVerboseOutput)
+                Console.WriteLine($"Epoch: {i}");
             trainer!.TrainOneEpoch( [ [0], [1] ] , [[0.3], [0.6]]);
-            Console.WriteLine();
+            if (EnableVerboseOutput)
+                Console.WriteLine();
             epochVerifier.VerifyEpoch(samples, observed);
-            Console.WriteLine();
+            if (EnableVerboseOutput)
+                Console.WriteLine();
         }
     }
 
@@ -119,13 +130,15 @@ public class OneNeuronTest
 
         Train();
 
-
-        Console.WriteLine("After training:");
-        var prediction = network!.Predict([0]);
-        Console.WriteLine($"0 => {prediction[0]}");
-        prediction = network.Predict([10]);
-        Console.WriteLine($"10 => {prediction[0]}");
-        prediction = network.Predict([-5]);
-        Console.WriteLine($"-5 => {prediction[0]}");
+        if (EnableVerboseOutput)
+        {
+            Console.WriteLine("After training:");
+            var prediction = network!.Predict([0]);
+            Console.WriteLine($"0 => {prediction[0]}");
+            prediction = network.Predict([10]);
+            Console.WriteLine($"10 => {prediction[0]}");
+            prediction = network.Predict([-5]);
+            Console.WriteLine($"-5 => {prediction[0]}");
+        }
     }
 }
