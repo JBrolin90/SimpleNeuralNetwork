@@ -6,7 +6,7 @@ public enum Operation { add, hypot }
 public class Sample
 {
     private double[] _sample = new double[4];
-    private double[] observed = [];
+    private double[] observed = new double[1];
     public double[] Xample => _sample;
     public double[] Observed => observed;
 
