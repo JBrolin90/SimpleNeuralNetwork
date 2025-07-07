@@ -50,8 +50,18 @@ public class NeuralNetwork : INeuralNetwork
     #endregion
     public double[] Predict(double[] inputs)
     {
-        int i = 0;
+        if (inputs == null)
+        {
+            throw new ArgumentNullException(nameof(inputs));
+        }
+
+        if (inputs.Length != Layers[0].InputProcessors[0].Weights.Length)
+        {
+            throw new IndexOutOfRangeException("Input size does not match network input size.");
+        }
+
         double[] outputs = inputs;
+        int i = 0;
         foreach (var layer in Layers)
         {
             outputs = layer.Forward(outputs);
