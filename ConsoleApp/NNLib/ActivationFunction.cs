@@ -9,6 +9,10 @@ public static class ActivationFunctions
 
     public static double SoftPlus(double x)
     {
+        if (double.IsPositiveInfinity(x))
+        {
+            return double.PositiveInfinity;
+        }
         return Math.Log(1 + Math.Exp(x));
     }
     public static double SoftPlusDerivative(double x)
