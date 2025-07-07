@@ -74,6 +74,20 @@ public class Layer : ILayer
     public Layer(int index, INeuronFactory NeuronFactory, IInputProcessorFactory inpuFactory,
         double[][] weights, double[][] biases, Func<double, double> activationFunction)
     {
+        // Validate arguments
+        if (NeuronFactory == null)
+            throw new ArgumentNullException(nameof(NeuronFactory));
+        if (inpuFactory == null)
+            throw new ArgumentNullException(nameof(inpuFactory));
+        if (weights == null)
+            throw new ArgumentNullException(nameof(weights));
+        if (biases == null)
+            throw new ArgumentNullException(nameof(biases));
+        
+        // Validate that weights and biases have the same length
+        if (weights.Length != biases.Length)
+            throw new IndexOutOfRangeException("Weights and biases arrays must have the same length.");
+
         Index = index;
         Weights = weights;
         Biases = biases;

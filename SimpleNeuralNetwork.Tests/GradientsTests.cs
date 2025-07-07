@@ -63,7 +63,8 @@ namespace SimpleNeuralNetwork.Tests
             int weightCount = -1;
             
             // Act & Assert
-            Assert.Throws<OverflowException>(() => new Gradients(weightCount));
+            var exception = Assert.Throws<ArgumentOutOfRangeException>(() => new Gradients(weightCount));
+            Assert.Equal("weightCount", exception.ParamName);
         }
 
         [Fact]

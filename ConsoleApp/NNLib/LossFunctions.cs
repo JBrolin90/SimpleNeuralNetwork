@@ -6,6 +6,10 @@ public static class LossFunctions
 {
     public static double[] SquaredError(double[] predicted, double[] observed)
     {
+        if (predicted == null)
+            throw new ArgumentNullException(nameof(predicted));
+        if (observed == null)
+            throw new ArgumentNullException(nameof(observed));
         if (predicted.Length != observed.Length)
             throw new ArgumentException("Arrays must be of the same length");
 

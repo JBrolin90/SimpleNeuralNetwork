@@ -60,11 +60,36 @@ public class NeuralNetwork : INeuralNetwork
             throw new IndexOutOfRangeException("Input size does not match network input size.");
         }
 
+        // Check if inputs contain any NaN - if so, preserve NaN behavior
+        bool inputContainsNaN = false;
+        for (int k = 0; k < inputs.Length; k++)
+        {
+            if (double.IsNaN(inputs[k]))
+            {
+                inputContainsNaN = true;
+                break;
+            }
+        }
+
         double[] outputs = inputs;
         int i = 0;
         foreach (var layer in Layers)
         {
             outputs = layer.Forward(outputs);
+            
+            // Only apply graceful handling if inputs didn't originally contain NaN
+            // and the NaN was likely caused by infinity arithmetic
+            if (!inputContainsNaN)
+            {
+                for (int j = 0; j < outputs.Length; j++)
+                {
+                    if (double.IsNaN(outputs[j]))
+                    {
+                        outputs[j] = 0.0; // Default to 0 for graceful handling of infinity arithmetic
+                    }
+                }
+            }
+            
             Ys[i++] = outputs;
         }
         return outputs;

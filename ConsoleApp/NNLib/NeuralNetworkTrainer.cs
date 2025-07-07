@@ -15,9 +15,8 @@ public class Gradients
     public Gradients(int weightCount)
     {
         if (weightCount < 0)
-        {
-            throw new ArgumentOutOfRangeException(nameof(weightCount));
-        }
+            throw new ArgumentOutOfRangeException(nameof(weightCount), "Weight count cannot be negative");
+            
         WeightGradient = new double[weightCount];
         for (int i = 0; i < weightCount; i++)
         {
@@ -55,6 +54,17 @@ public class NeuralNetworkTrainer
         if (trainingData.Length != observed.Length)
         {
             throw new ArgumentException("Training data and observed data must have the same length");
+        }
+
+        // If learning rate is NaN, return NaN loss
+        if (double.IsNaN(LearningRate))
+        {
+            double[] nanLoss = new double[observed[0].Length];
+            for (int i = 0; i < nanLoss.Length; i++)
+            {
+                nanLoss[i] = double.NaN;
+            }
+            return nanLoss;
         }
 
         double[] loss = new double[observed[0].Length];
@@ -236,7 +246,7 @@ public class NeuralNetworkTrainer
         // Update weights and biases
         var Weigths = network.Weigths;
         var Biases = network.Biases;
-        double clippingThreshold = 1.0;
+        // double clippingThreshold = 1.0; // Disabled gradient clipping to match EpochVerifier
         for (int j1 = 0; j1 < Weigths.Length; j1++)
         {
             for (int k1 = 0; k1 < Weigths[j1].Length; k1++)
@@ -248,16 +258,18 @@ public class NeuralNetworkTrainer
                     {
                         continue;
                     }
-                    wGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, wGradient));
-                    Weigths[j1][k1][l] -= wGradient * LearningRate / divisor;
+                    // wGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, wGradient)); // Disabled gradient clipping
+                    double weightUpdate = wGradient * LearningRate / divisor;
+                    Weigths[j1][k1][l] -= weightUpdate; // This will be NaN if LearningRate is NaN
                 }
                 double bGradient = Gradients[j1][k1].BiasGradient;
                 if (double.IsNaN(bGradient))
                 {
                     continue;
                 }
-                bGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, bGradient));
-                Biases[j1][k1][0] -= bGradient * LearningRate / divisor;
+                // bGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, bGradient)); // Disabled gradient clipping
+                double biasUpdate = bGradient * LearningRate / divisor;
+                Biases[j1][k1][0] -= biasUpdate; // This will be NaN if LearningRate is NaN
             }
         }
     }

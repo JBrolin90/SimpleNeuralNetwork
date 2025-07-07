@@ -34,6 +34,11 @@ public class InputProcessor : IInputProcessor
 
     public InputProcessor(ILayer layer, int index, double[] weights, double[] bias)
     {
+        if (weights == null)
+            throw new ArgumentNullException(nameof(weights));
+        if (bias == null)
+            throw new ArgumentNullException(nameof(bias));
+            
         Layer = layer;
         Index = index;
         Weights = weights;
@@ -54,13 +59,14 @@ public class InputProcessor : IInputProcessor
             throw new IndexOutOfRangeException("Input size does not match weights size.");
         }
 
+        I = inputs; // Store the inputs
         Y = 0;
         for (int i = 0; i < inputs.Length; i++)
         {
             double product = inputs[i] * Weights[i];
             if (double.IsInfinity(inputs[i]) && Weights[i] == 0)
             {
-                product = 0; // Or some other sensible default
+                product = 0; // Handle infinity * 0 = 0
             }
             Y += product;
         }

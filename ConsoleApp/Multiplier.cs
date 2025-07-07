@@ -36,8 +36,8 @@ public class Normalizer
 
 public class Multiplier
 {
-    const int epochs = 240000;
-    const double learningRate = 0.35;
+    const int epochs = 130000;
+    const double learningRate = 0.15;
 
     INeuralNetwork? network = null;
     NeuralNetworkTrainer? trainer;

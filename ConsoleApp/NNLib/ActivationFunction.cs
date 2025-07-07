@@ -25,7 +25,8 @@ public static class ActivationFunctions
     }
     public static double SigmoidDerivative(double x)
     {
-        return x * (1 - x);
+        double sigmoid = Sigmoid(x);
+        return sigmoid * (1 - sigmoid);
     }
 
     public static double Tanh(double x)
@@ -34,7 +35,8 @@ public static class ActivationFunctions
     }
     public static double TanhDerivative(double x)
     {
-        return 1 - x * x;
+        double tanh = Tanh(x);
+        return 1 - tanh * tanh;
     }
     public static double ReLU(double x)
     {
@@ -42,7 +44,7 @@ public static class ActivationFunctions
     }
     public static double ReLUDerivative(double x)
     {
-        return x < 0 ? 0 : 1;
+        return x <= 0 ? 0 : 1;
     }
 
     public static double LeakyReLU(double x, double alpha = 0.01)

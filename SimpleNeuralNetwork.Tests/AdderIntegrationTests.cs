@@ -294,6 +294,8 @@ namespace SimpleNeuralNetwork.Tests
             {
                 VerifyPrediction(samples[i][0], samples[i][1], observed[i][0]);
             }
+            
+            // Update weights with the accumulated gradients divided by batch size
             W1 -= wGrad1Sum * LearningRate / samples.Length;
             W2 -= wGrad2Sum * LearningRate / samples.Length;
             B -= bGradSum * LearningRate / samples.Length;

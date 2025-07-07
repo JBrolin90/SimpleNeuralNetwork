@@ -47,13 +47,18 @@ public class NetworkCreator
 
     public void RandomizeWeights(double from, double to)
     {
-        double NextDouble(double _) => new Random().NextDouble() * (to - from) - (to - from) / 2;
+        double NextDouble(double _) => from + new Random().NextDouble() * (to - from);
         ApplyOn3dArr(Weights, NextDouble);
 
     }
 
     public static void ActOn3dArr(double[][][] arr, Action<double> action)
     {
+        if (arr == null)
+            throw new ArgumentNullException(nameof(arr));
+        if (action == null)
+            throw new ArgumentNullException(nameof(action));
+
         int layerCount = arr.Length;
         for (int i = 0; i < layerCount; i++)
         {
@@ -70,6 +75,11 @@ public class NetworkCreator
     }
     public static void ApplyOn3dArr(double[][][] arr, Func<double, double> func)
     {
+        if (arr == null)
+            throw new ArgumentNullException(nameof(arr));
+        if (func == null)
+            throw new ArgumentNullException(nameof(func));
+
         int layerCount = arr.Length;
         for (int i = 0; i < layerCount; i++)
         {
@@ -87,9 +97,53 @@ public class NetworkCreator
 
     public INeuralNetwork CreateNetwork()
     {
+        // Create deep copies of weights, biases, and ys to ensure independence
+        var weightsCopy = DeepCopy3DArray(Weights);
+        var biasesCopy = DeepCopy3DArray(Biases);
+        var ysCopy = DeepCopy2DArray(Ys);
+        
         NeuralNetwork n = new(new LayerFactory(), new NeuronFactory(), new InputProcessorFactory(),
-                        Weights, Biases, Ys,
+                        weightsCopy, biasesCopy, ysCopy,
                         ActivationFunctions);
         return n;
+    }
+    
+    private static double[][][] DeepCopy3DArray(double[][][] source)
+    {
+        if (source == null) return new double[0][][];
+        
+        var copy = new double[source.Length][][];
+        for (int i = 0; i < source.Length; i++)
+        {
+            if (source[i] != null)
+            {
+                copy[i] = new double[source[i].Length][];
+                for (int j = 0; j < source[i].Length; j++)
+                {
+                    if (source[i][j] != null)
+                    {
+                        copy[i][j] = new double[source[i][j].Length];
+                        Array.Copy(source[i][j], copy[i][j], source[i][j].Length);
+                    }
+                }
+            }
+        }
+        return copy;
+    }
+    
+    private static double[][] DeepCopy2DArray(double[][] source)
+    {
+        if (source == null) return new double[0][];
+        
+        var copy = new double[source.Length][];
+        for (int i = 0; i < source.Length; i++)
+        {
+            if (source[i] != null)
+            {
+                copy[i] = new double[source[i].Length];
+                Array.Copy(source[i], copy[i], source[i].Length);
+            }
+        }
+        return copy;
     }
 }
