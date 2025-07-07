@@ -32,24 +32,37 @@ public class InputProcessor : IInputProcessor
     public double[] Weights { get; set; }
     public double[] Bias { get; set; }
 
-    public double[] I { get; set; } = [];
-    public double Y { get; set; } = 0;
-
     public InputProcessor(ILayer layer, int index, double[] weights, double[] bias)
     {
         Layer = layer;
         Index = index;
         Weights = weights;
         Bias = bias;
-
     }
-    public double ProcessInputs(double[] xs)
+
+    public double[] I { get; set; } = [];
+    public double Y { get; set; } = 0;
+    public double ProcessInputs(double[] inputs)
     {
-        I = xs;
-        Y = 0;
-        for (int i = 0; i < xs.Length; i++)
+        if (inputs == null)
         {
-            Y += xs[i] * Weights[i];
+            throw new ArgumentNullException(nameof(inputs));
+        }
+
+        if (inputs.Length != Weights.Length)
+        {
+            throw new IndexOutOfRangeException("Input size does not match weights size.");
+        }
+
+        Y = 0;
+        for (int i = 0; i < inputs.Length; i++)
+        {
+            double product = inputs[i] * Weights[i];
+            if (double.IsInfinity(inputs[i]) && Weights[i] == 0)
+            {
+                product = 0; // Or some other sensible default
+            }
+            Y += product;
         }
         Y += Bias[0];
         return Y;
