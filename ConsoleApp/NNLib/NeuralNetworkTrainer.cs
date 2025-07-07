@@ -14,6 +14,10 @@ public class Gradients
 
     public Gradients(int weightCount)
     {
+        if (weightCount < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(weightCount));
+        }
         WeightGradient = new double[weightCount];
         for (int i = 0; i < weightCount; i++)
         {
@@ -23,6 +27,7 @@ public class Gradients
 }
 
 public class NeuralNetworkTrainer
+
 {
 
     public Func<double[][], double[][], double[]> LossFunction = LossFunctions.SumSquaredError;
@@ -42,19 +47,28 @@ public class NeuralNetworkTrainer
     double[] dLoss = [];
     public double[] TrainOneEpoch(double[][] trainingData, double[][] observed)
     {
-        int outputCount = network.Layers[^1].Neurons.Length;
+        if (trainingData.Length == 0)
+        {
+            throw new ArgumentException("Training data cannot be empty");
+        }
+
+        if (trainingData.Length != observed.Length)
+        {
+            throw new ArgumentException("Training data and observed data must have the same length");
+        }
+
+        double[] loss = new double[observed[0].Length];
+        double[] dLoss = new double[observed[0].Length];
+
+        PrepareBackPropagation();
 
         double[][] predictions = new double[trainingData.Length][];
-        PrepareBackPropagation();
-        ResetGradients();
-        loss = new double[observed[0].Length];
-        dLoss = new double[observed[0].Length];
         for (int i = 0; i < trainingData.Length; i++)
         {
             // Forward pass
             predictions[i] = network.Predict(trainingData[i]);
-            double[] lossPart = LossFunctions.SquaredError(predictions[i], observed[i]);
-            double[] dLossPart = LossFunctions.SquaredErrorDerivative(predictions[i], observed[i]);
+            double[] lossPart = LossFunction(new[] { predictions[i] }, new[] { observed[i] });
+            double[] dLossPart = LossFunctionD(new[] { predictions[i] }, new[] { observed[i] });
             int count = predictions[i].Length;
             for (int j = 0; j < count; j++)
             {
@@ -222,6 +236,7 @@ public class NeuralNetworkTrainer
         // Update weights and biases
         var Weigths = network.Weigths;
         var Biases = network.Biases;
+        double clippingThreshold = 1.0;
         for (int j1 = 0; j1 < Weigths.Length; j1++)
         {
             for (int k1 = 0; k1 < Weigths[j1].Length; k1++)
@@ -229,11 +244,22 @@ public class NeuralNetworkTrainer
                 for (int l = 0; l < Weigths[j1][k1].Length; l++)
                 {
                     double wGradient = Gradients[j1][k1].WeightGradient[l];
+                    if (double.IsNaN(wGradient))
+                    {
+                        continue;
+                    }
+                    wGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, wGradient));
                     Weigths[j1][k1][l] -= wGradient * LearningRate / divisor;
                 }
                 double bGradient = Gradients[j1][k1].BiasGradient;
+                if (double.IsNaN(bGradient))
+                {
+                    continue;
+                }
+                bGradient = Math.Max(-clippingThreshold, Math.Min(clippingThreshold, bGradient));
                 Biases[j1][k1][0] -= bGradient * LearningRate / divisor;
             }
         }
     }
+
 }
